@@ -1,7 +1,7 @@
 
-import Old_Files.Nodev1;
-import Old_Files.Nodev3;
-import Old_Files.Nodev2;
+//import Old_Files.Nodev1;
+//import Old_Files.Nodev3;
+//import Old_Files.Nodev2;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,109 +70,109 @@ public class testClass {
 
     }
     
-    public void testNodev1(){
-         // Tạo ra 2 Node độc lập
-        Nodev1 node1 = new Nodev1(1);
-        Nodev1 node2 = new Nodev1(2);
-
-        // Kết nối mạng "giả lập" cho 2 ông nhìn thấy nhau
-        node1.setOtherNode(node2);
-        node2.setOtherNode(node1);
-
-        // Thử nghiệm: Kích hoạt Node 1 gửi yêu cầu đi
-        System.out.println("--- Bắt đầu mô phỏng giao tiếp ---");
-        node1.sendRequest();
-
-    }
+//    public void testNodev1(){
+//         // Tạo ra 2 Node độc lập
+//        Nodev1 node1 = new Nodev1(1);
+//        Nodev1 node2 = new Nodev1(2);
+//
+//        // Kết nối mạng "giả lập" cho 2 ông nhìn thấy nhau
+//        node1.setOtherNode(node2);
+//        node2.setOtherNode(node1);
+//
+//        // Thử nghiệm: Kích hoạt Node 1 gửi yêu cầu đi
+//        System.out.println("--- Bắt đầu mô phỏng giao tiếp ---");
+//        node1.sendRequest();
+//
+//    }
     
-    public void testNodev2(){
-        SharedResource sharedResource = new SharedResource();
-        
-        Nodev2 node1 = new Nodev2(1, sharedResource);
-        Nodev2 node2 = new Nodev2(2, sharedResource);
-
-        node1.setOtherNode(node2);
-        node2.setOtherNode(node1);
-
-        System.out.println("--- KHỞI CHẠY TRANH CHẤP ĐỒNG THỜI (2 THREAD) ---");
-
-        // Tạo 2 thread chạy đua kích hoạt cùng lúc
-        Thread t1 = new Thread(() -> node1.requestCriticalSection());
-        Thread t2 = new Thread(() -> node2.requestCriticalSection());
-
-        t1.start();
-        t2.start();
-
-    }
+//    public void testNodev2(){
+//        SharedResource sharedResource = new SharedResource();
+//        
+//        Nodev2 node1 = new Nodev2(1, sharedResource);
+//        Nodev2 node2 = new Nodev2(2, sharedResource);
+//
+//        node1.setOtherNode(node2);
+//        node2.setOtherNode(node1);
+//
+//        System.out.println("--- KHỞI CHẠY TRANH CHẤP ĐỒNG THỜI (2 THREAD) ---");
+//
+//        // Tạo 2 thread chạy đua kích hoạt cùng lúc
+//        Thread t1 = new Thread(() -> node1.requestCriticalSection());
+//        Thread t2 = new Thread(() -> node2.requestCriticalSection());
+//
+//        t1.start();
+//        t2.start();
+//
+//    }
     
-    public void testNodev3(){
-        SharedResource sharedResource = new SharedResource();
-
-        // 1. Tạo ra 3 Node độc lập
-        Nodev3 node1 = new Nodev3(1, sharedResource);
-        Nodev3 node2 = new Nodev3(2, sharedResource);
-        Nodev3 node3 = new Nodev3(3, sharedResource);
-
-        // 2. Kết nối chéo các node với nhau (Full Mesh Topology)
-        node1.addNeighbor(node2); node1.addNeighbor(node3);
-        node2.addNeighbor(node1); node2.addNeighbor(node3);
-        node3.addNeighbor(node1); node3.addNeighbor(node2);
-
-        System.out.println("--- KHỞI CHẠY TRANH CHẤP ĐỒNG THỜI GIỮA 3 NODE ---");
-
-        // 3. Kích hoạt cả 3 node cùng yêu cầu vào Miền găng một lúc bằng 3 Thread
-        Thread t1 = new Thread(() -> node1.requestCriticalSection());
-        Thread t2 = new Thread(() -> node2.requestCriticalSection());
-        Thread t3 = new Thread(() -> node3.requestCriticalSection());
-
-        t1.start();
-        t2.start();
-        t3.start();
-
-    }
+//    public void testNodev3(){
+//        SharedResource sharedResource = new SharedResource();
+//
+//        // 1. Tạo ra 3 Node độc lập
+//        Nodev3 node1 = new Nodev3(1, sharedResource);
+//        Nodev3 node2 = new Nodev3(2, sharedResource);
+//        Nodev3 node3 = new Nodev3(3, sharedResource);
+//
+//        // 2. Kết nối chéo các node với nhau (Full Mesh Topology)
+//        node1.addNeighbor(node2); node1.addNeighbor(node3);
+//        node2.addNeighbor(node1); node2.addNeighbor(node3);
+//        node3.addNeighbor(node1); node3.addNeighbor(node2);
+//
+//        System.out.println("--- KHỞI CHẠY TRANH CHẤP ĐỒNG THỜI GIỮA 3 NODE ---");
+//
+//        // 3. Kích hoạt cả 3 node cùng yêu cầu vào Miền găng một lúc bằng 3 Thread
+//        Thread t1 = new Thread(() -> node1.requestCriticalSection());
+//        Thread t2 = new Thread(() -> node2.requestCriticalSection());
+//        Thread t3 = new Thread(() -> node3.requestCriticalSection());
+//
+//        t1.start();
+//        t2.start();
+//        t3.start();
+//
+//    }
     
-    public void testSR(){
-        SharedResource sharedResource = new SharedResource();
-        int totalNodes = 5;
-        List<Nodev3> ALL_NODES = new ArrayList<>();
-
-        // 1. Khởi tạo 5 Node
-        for (int i = 1; i <= totalNodes; i++) {
-            ALL_NODES.add(new Nodev3(i, sharedResource));
-        }
-
-        // 2. Kết nối chéo Full-Mesh (Mỗi ông kết nối tới 4 ông còn lại)
-        for (Nodev3 node : ALL_NODES) {
-            for (Nodev3 other : ALL_NODES) {
-                if (node != other) {
-                    node.addNeighbor(other);
-                }
-            }
-        }
-
-        System.out.println("=========================================================");
-        System.out.println("START STRESS TEST: 5 NODE TRANH CHẤP LIÊN TỤC (THREAD-BASED)");
-        System.out.println("=========================================================");
-
-        // 3. Kích hoạt 5 Node chạy đua độc lập
-        for (Nodev3 node : ALL_NODES) {
-            new Thread(() -> {
-                // Mỗi node sẽ đòi vào miền găng 3 lần
-                for (int attempt = 1; attempt <= 3; attempt++) {
-                    try {
-                        // BƯỚC 9: Delay ngẫu nhiên từ 0 đến 2 giây trước khi "đòi ăn"
-                        Thread.sleep((long) (Math.random() * 2000));
-                        
-                        node.requestCriticalSection();
-                        
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        }
-
-    }
+//    public void testSR(){
+//        SharedResource sharedResource = new SharedResource();
+//        int totalNodes = 5;
+//        List<Nodev3> ALL_NODES = new ArrayList<>();
+//
+//        // 1. Khởi tạo 5 Node
+//        for (int i = 1; i <= totalNodes; i++) {
+//            ALL_NODES.add(new Nodev3(i, sharedResource));
+//        }
+//
+//        // 2. Kết nối chéo Full-Mesh (Mỗi ông kết nối tới 4 ông còn lại)
+//        for (Nodev3 node : ALL_NODES) {
+//            for (Nodev3 other : ALL_NODES) {
+//                if (node != other) {
+//                    node.addNeighbor(other);
+//                }
+//            }
+//        }
+//
+//        System.out.println("=========================================================");
+//        System.out.println("START STRESS TEST: 5 NODE TRANH CHẤP LIÊN TỤC (THREAD-BASED)");
+//        System.out.println("=========================================================");
+//
+//        // 3. Kích hoạt 5 Node chạy đua độc lập
+//        for (Nodev3 node : ALL_NODES) {
+//            new Thread(() -> {
+//                // Mỗi node sẽ đòi vào miền găng 3 lần
+//                for (int attempt = 1; attempt <= 3; attempt++) {
+//                    try {
+//                        // BƯỚC 9: Delay ngẫu nhiên từ 0 đến 2 giây trước khi "đòi ăn"
+//                        Thread.sleep((long) (Math.random() * 2000));
+//                        
+//                        node.requestCriticalSection();
+//                        
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }).start();
+//        }
+//
+//    }
     
     public void testNode() throws InterruptedException{
         SharedResource sharedResource = new SharedResource();
