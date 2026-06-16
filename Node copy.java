@@ -120,7 +120,6 @@ public class Node {
 
         this.state = State.WANTED;
         clock.increment();
-        // Timestamp của lần request CS hiện tại
         this.myRequestTimestamp = clock.getTimestamp();
         this.replyCount = 0;
 
@@ -128,7 +127,7 @@ public class Node {
         
         // Broadcast REQUEST qua mạng Socket
         for (int port : neighborPorts) {
-            System.out.println(String.format("[Node %d] ---> GỬI REQUEST (T=%d, id=%d) tới Port %d", this.id, this.myRequestTimestamp, this.id, port));
+            System.out.println(String.format("[Node %d] ---> GỬI REQUEST (T=%d) tới Port %d", this.id, this.myRequestTimestamp, port));
             String msg = "REQUEST," + this.id + "," + this.myRequestTimestamp;
             new Thread(() -> sendMessageViaSocket(port, msg)).start();
         }
@@ -149,59 +148,10 @@ public class Node {
                 (this.state == State.WANTED && myReq.compareTo(incomingReq) < 0);
 
         if (shouldDefer) {
-            
-            StringBuilder sb = new StringBuilder();
-            sb.append(String.format(
-                    "[Node %d] <--- NHẬN REQUEST từ Node %d (T_req=%d,id_req=%d). "
-                            + "So sánh:\nmyReq(T=%d, id=%d)\nother(T_req=%d, id_req=%d)\n"
-                            + "Kết quả: Node %d ưu tiên hơn\n"
-                            + "Hành động: Cho Node %d vào hàng đợi, hoãn phản hồi Node %d\n", 
-                    this.id, 
-                    senderId, 
-                    senderTimestamp,
-                    senderId,
-                    this.myRequestTimestamp,
-                    this.id,
-                    senderTimestamp,
-                    senderId,
-                    this.id,
-                    senderId,
-                    senderId
-            ));
-            
+            System.out.println(String.format("[Node %d] <--- NHẬN REQUEST từ Node %d (T_req=%d). !!! HOÃN BINH !!!", this.id, senderId, senderTimestamp));
             this.deferredQueue.add(senderId);
-            
-            sb.append(String.format("[Node %d] Hàng đợi: ", this.id));
-            for(int q : this.deferredQueue){
-                sb.append(q + " "); 
-            }
-            sb.append("\n");
-            System.out.println(sb.toString());
-            
         } else {
-            
-            String msg = "";
-            if(myReq.compareTo(incomingReq) > 0){
-                msg = this.id + " có độ ưu tiên thấp hơn " + senderId + ". Chờ và phản hồi " + senderId;
-            }
-            else if(this.state == State.RELEASED){
-                msg = this.id + " không bận, phản hồi " + senderId + " ngay";
-            }
-            
-            
-            System.out.println(String.format(
-                    "[Node %d] <--- NHẬN REQUEST từ Node %d (T_req=%d)."
-                            + "So sánh:\nmyReq(T=%d, id=%d)\nother(T_req=%d, id_req=%d)\n"
-                            + "Kết quả: " + msg, 
-                    this.id, 
-                    senderId, 
-                    senderTimestamp,
-                    this.myRequestTimestamp,
-                    this.id,
-                    senderTimestamp,
-                    senderId
-            ));
-            
+            System.out.println(String.format("[Node %d] <--- NHẬN REQUEST từ Node %d (T_req=%d). REPLY ngay.", this.id, senderId, senderTimestamp));
             sendReply(senderId);
         }
     }
@@ -210,24 +160,23 @@ public class Node {
         clock.increment();
         int targetPort = 9000 + targetId;
         String msg = "REPLY," + this.id + "," + clock.getTimestamp();
-        System.out.println("Đang gửi phản hồi tới " + targetId + ": " + msg);
         new Thread(() -> sendMessageViaSocket(targetPort, msg)).start();
     }
 
-    public synchronized void receiveReply(int senderId, int senderTimestamp) {      
+    public synchronized void receiveReply(int senderId, int senderTimestamp) {
         // BƯỚC 14: Đồng bộ Lamport Clock khi nhận REPLY qua mạng
         clock.update(senderTimestamp);
         replyCount++;
-        System.out.println(String.format("[Node %d] <--- NHẬN REPLY từ Node %d. Timestamp: %d (Đã có %d/%d REPLY)", 
-                this.id, senderId, clock.getTimestamp(), replyCount, neighborPorts.size()));
+        System.out.println(String.format("[Node %d] <--- NHẬN REPLY từ Node %d. (Đã có %d/%d REPLY)", 
+                this.id, senderId, replyCount, neighborPorts.size()));
 
         if (replyCount == neighborPorts.size()) {
-            this.state = State.HELD;
-            new Thread(() -> enterCriticalSection()).start();
-        }        
+            enterCriticalSection();
+        }
     }
 
     private void enterCriticalSection() {
+        this.state = State.HELD;
         sharedResource.access(this.id);
         this.state = State.RELEASED;
         
@@ -239,12 +188,6 @@ public class Node {
             System.out.println(String.format("[Node %d] ---> TRẢ NỢ REPLY cho Node %d.", this.id, nodeId));
             sendReply(nodeId);
         }
-        
-        // Chung lock (monitor) với cNode.requestCS.wait()
-        synchronized(this)
-        {
-            notifyAll();
-        }
-        
+        notifyAll();
     }
 }
