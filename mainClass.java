@@ -10,7 +10,7 @@ public class mainClass {
         }
 
 
-        boolean localTest = true;
+        boolean localTest = false;
 
         int myId = Integer.parseInt(args[0]);
         int myPort = Integer.parseInt(args[1]);

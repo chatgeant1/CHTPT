@@ -2,6 +2,8 @@
 // đại diện cho [một lời yêu cầu] (ở đây là 1 request vào CS)
 // sẽ tự biết so sánh nó với một lời yêu cầu khác 
 // bằng cách triển khai Interface Comparable của Java
+// Node 1 request, chờ reply
+// Node 2 cũng request ... tới node 1 => so sánh 2 NodeRequest
 
 public class NodeRequest implements Comparable<NodeRequest> {
     private final int timestamp;

@@ -7,12 +7,12 @@ public class LamportClock {
         return timestamp;
     }
 
-    // Tăng đồng hồ lên 1 (gọi trước khi ... tin nhắn hoặc khi có sự kiện nội bộ)
+    // Tăng đồng hồ lên 1 (gọi trước khi gửi tin nhắn hoặc khi có sự kiện nội bộ)
     public synchronized void increment() {
         timestamp++;
     }
 
-    // Đồng bộ đồng hồ khi nhận được tin nhắn từ bên ngoài
+    // Đồng bộ đồng hồ khi nhận được tin nhắn từ bên ngoài (phản hồi)
     public synchronized void update(int receivedTimestamp) {
         this.timestamp = Math.max(this.timestamp, receivedTimestamp) + 1;
     }

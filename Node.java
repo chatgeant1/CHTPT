@@ -38,6 +38,7 @@ public class Node {
     private final int id;
     private final String myIp; 
     private final int myPort;
+
     private final List<Neighbor> neighbors = new ArrayList<>();
     private final LamportClock clock = new LamportClock();
     private final SharedResource sharedResource;
@@ -102,8 +103,10 @@ public class Node {
         // Phương án dự phòng 2: Nếu không tìm thấy dải 192 ưu tiên, thì quét lại một lượt lấy IP đầu tiên hợp lệ
         interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
+
             NetworkInterface iface = interfaces.nextElement();
             if (iface.isLoopback() || !iface.isUp()) continue;
+
             Enumeration<InetAddress> addresses = iface.getInetAddresses();
             while (addresses.hasMoreElements()) {
                 InetAddress addr = addresses.nextElement();
@@ -111,6 +114,7 @@ public class Node {
                     return addr.getHostAddress();
                 }
             }
+
         }
         
         return InetAddress.getLocalHost().getHostAddress();
@@ -125,9 +129,12 @@ public class Node {
     public void startDiscovery() {
         // 1. Thread lắng nghe tín hiệu "Chào hỏi" từ các máy khác
         Thread listenerThread = new Thread(() -> {
+
             try (DatagramSocket socket = new DatagramSocket(DISCOVERY_PORT)) {
+
                 socket.setBroadcast(true);
                 byte[] buffer = new byte[1024];
+                
                 while (true) {
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                     socket.receive(packet); // Nhận gói tin phát sóng
@@ -164,6 +171,7 @@ public class Node {
         Thread broadcasterThread = new Thread(() -> {
             try (DatagramSocket socket = new DatagramSocket()) {
                 socket.setBroadcast(true);
+                
                 // Gửi thông điệp chứa ID và Port TCP của mình đi khắp mạng LAN
                 String broadcastMessage = String.format("DISCOVER_NODE:%d:%d", this.id, this.myPort);
                 byte[] buffer = broadcastMessage.getBytes();
@@ -209,6 +217,7 @@ public class Node {
         serverThread.start();
     }
 
+    // sendMessageViaSocket, truyền msg tới socket của node bên kia, bên kia (server) accept và gọi handle này:
     private void handleIncomingConnection(Socket socket) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
             String line = reader.readLine();
@@ -222,9 +231,12 @@ public class Node {
 
                 Neighbor sender = new Neighbor(senderId, senderIp, senderPort);
 
+                // Node này Nhận request của bên gửi:
                 if (type.equals("REQUEST")) {
                     receiveRequest(sender, senderTimestamp);
-                } else if (type.equals("REPLY")) {
+                } 
+                // Node này nhận reply từ bên gửi
+                else if (type.equals("REPLY")) {
                     receiveReply(senderId, senderTimestamp);
                 }
             }
@@ -238,12 +250,15 @@ public class Node {
     // ==========================================
     public synchronized void requestCriticalSection() {
 
+        // Tránh request nhiều lần liên tục khi 1 lần request chưa hoàn thành
         while (this.state != State.RELEASED) {
             try { wait(); } catch (InterruptedException e) {}
         }
 
         this.state = State.WANTED;
         clock.increment();
+
+        // Thời gian timestamp bắt đầu request vào CS
         this.myRequestTimestamp = clock.getTimestamp();
         this.replyCount = 0;
 
@@ -257,6 +272,7 @@ public class Node {
                 return;
             }
 
+            // Duyệt danh sách, gửi request tới từng hàng xóm 
             String msg = String.format("REQUEST,%d,%s,%d,%d", this.id, this.myIp, this.myPort, myRequestTimestamp);
             for (Neighbor neighbor : neighbors) {
                 System.out.println(String.format("\n[Node %d] ---> GỬI REQUEST (T=%d, id=%d) tới Node %d:%s:%d", this.id, this.myRequestTimestamp, this.id, neighbor.id, neighbor.ip, neighbor.port));
@@ -264,6 +280,7 @@ public class Node {
             }
         }
 
+        // Kết thúc while khi notifyAll() tại enterCS (kết thúc quá trình request CS)
         while (this.state != State.RELEASED) {
             try { wait(); } catch (InterruptedException e) {}
         }
@@ -273,6 +290,7 @@ public class Node {
         System.out.println(String.format("[Node %d] <--- NHẬN REQUEST từ Node %d [T_req=%d]", this.id, sender.id, senderTimestamp));
         clock.update(senderTimestamp);
 
+        // So sánh 2 request (n1 -> n2, n2 -> n1)
         NodeRequest myReq = new NodeRequest(myRequestTimestamp, this.id);
         NodeRequest otherReq = new NodeRequest(senderTimestamp, sender.id);
 
@@ -323,7 +341,7 @@ public class Node {
                     this.id, senderTimestamp, sender.id
             ));
 
-            // Gửi phản hồi tới người gửi
+            // Gửi phản hồi tới người gửi request
             sendReply(sender);
         }
 
@@ -346,6 +364,7 @@ public class Node {
         System.out.println(String.format("[Node %d] <--- NHẬN REPLY từ Node %d. (Đã thu thập %d/%d REPLY)", 
                 this.id, senderId, replyCount, totalNeighbors));
 
+        // Nếu đủ số reply thì vào CS
         if (replyCount == totalNeighbors) {
             this.state = State.HELD;
             new Thread(() -> enterCriticalSection()).start();
@@ -372,7 +391,7 @@ public class Node {
 
     private void sendMessageViaSocket(String targetIp, int targetPort, String message) {
         try (Socket socket = new Socket(targetIp, targetPort);
-             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
+            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
             writer.println(message);
         } catch (Exception e) {
             System.err.println(String.format("[Node %d] Không thể kết nối tới %s:%d", this.id, targetIp, targetPort));

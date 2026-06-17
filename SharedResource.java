@@ -35,7 +35,8 @@ import java.net.Socket;
 public class SharedResource {
     
     
-    private static final String displayHost = "192.168.43.101";
+    // SỬA THEO IP CỦA 1 NODE - NODE ĐÓ SẼ LÀM MONITOR HIỂN THỊ "NODE NÀO ĐANG Ở TRONG CS" (MỌI NODE GỬI MSG TỚI ĐỊA CHỈ NÀY)
+    private static final String displayHost = "192.168.222.220";
     
     
     private static final int displayPort = 9999;

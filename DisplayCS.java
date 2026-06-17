@@ -3,6 +3,9 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+
+// CHỈ MÁY NODE CÓ IP ĐỊNH NGHĨA TRONG SharedResource."displayHost" mới cần chạy file này
+// Mở server chờ kết nối và hiển thị nội dung là "Node nào đang vào CS"
 public class DisplayCS {
     public static void main(String[] args) {
         int displayPort = 9999; // Cổng phụ chuyên hứng log Miền Găng
