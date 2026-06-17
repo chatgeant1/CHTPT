@@ -1,0 +1,9 @@
+[Node 2] c?p nh?t trong CS | Value = 10 | T = 4
+Đồng bộ từ Node 1 | Value = 10
+[Node 2] cập nhật trong CS | Value = 20 | T = 7
+Đồng bộ từ Node 1 | Value = 30
+[Node 2] cập nhật trong CS | Value = 40 | T = 13
+Đồng bộ từ Node 1 | Value = 50
+[Node 2] cập nhật trong CS | Value = 60 | T = 19
+Đồng bộ từ Node 1 | Value = 70
+[Node 2] cập nhật trong CS | Value = 80 | T = 25

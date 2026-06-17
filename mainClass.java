@@ -10,12 +10,12 @@ public class mainClass {
         }
 
 
-        boolean localTest = false;
+        boolean localTest = true;
 
         int myId = Integer.parseInt(args[0]);
         int myPort = Integer.parseInt(args[1]);
 
-        SharedResource sharedResource = new SharedResource();
+        SharedResource sharedResource = new SharedResource(myId);
         Node node = new Node(myId, myPort, sharedResource, localTest);        
        
         if(localTest){ 

@@ -222,6 +222,7 @@ public class Node {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
             String line = reader.readLine();
             if (line != null && !line.trim().isEmpty()) {
+                // type, id, ip, port, msg
                 String[] parts = line.split(",");
                 String type = parts[0];
                 int senderId = Integer.parseInt(parts[1]);
@@ -238,6 +239,13 @@ public class Node {
                 // Node này nhận reply từ bên gửi
                 else if (type.equals("REPLY")) {
                     receiveReply(senderId, senderTimestamp);
+                }
+                // Node nhận replicate
+                else if (type.equals("REPLICATE")) {
+                    // Nhận lệnh đồng bộ dữ liệu từ node đang ở trong CS
+                    int newValue = Integer.parseInt(parts[4]);
+                    sharedResource.passiveUpdate(senderId, newValue);
+                    System.out.println(String.format("[HỆ THỐNG] Đã đồng bộ dữ liệu theo Node %d (Value mới = %d)", senderId, newValue));
                 }
             }
         } catch (Exception e) {
@@ -372,7 +380,24 @@ public class Node {
     }
 
     private void enterCriticalSection() {
-        sharedResource.access(this.id, this.clock.getTimestamp());
+        System.out.println(String.format("\n>>> [ENTER] Node %d bắt đầu độc chiếm tài nguyên", this.id));
+        
+        // 1. Thay đổi dữ liệu trên chính máy mình
+        sharedResource.accessAndModify(this.clock.getTimestamp());
+
+        // 2. Phát lệnh mạng ép các Node khác đồng bộ theo giá trị mới qua Socket đang có sẵn
+        int newValue = sharedResource.getSharedValue();
+        for (Neighbor neighbor : neighbors) { 
+            // "REQUEST,%d,%s,%d,%d", this.id, this.myIp, this.myPort, myRequestTimestamp)
+            String syncMsg = String.format("REPLICATE,%d,%s,%d,%d", this.id, this.myIp, this.myPort, newValue);
+            new Thread(() -> sendMessageViaSocket(neighbor.ip, neighbor.port, syncMsg)).start();
+        }
+
+        // Giả lập làm việc trong CS 2 giây
+        try { Thread.sleep(5000); } catch (InterruptedException e) {}
+
+        System.out.println(String.format("<<< [EXIT] Node %d rời miền găng.", this.id));
+
         this.state = State.RELEASED;
         
         System.out.println(String.format("[Node %d] Thoát CS. Giải phóng hàng đợi...", this.id));
