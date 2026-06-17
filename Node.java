@@ -312,24 +312,55 @@ public class Node {
     }
 
     private String autoDiscoverEnvironmentIP() {
-        try {
-            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            while (interfaces.hasMoreElements()) {
-                NetworkInterface iface = interfaces.nextElement();
-                if (iface.isLoopback() || !iface.isUp() || iface.isVirtual()) continue;
-                Enumeration<InetAddress> addresses = iface.getInetAddresses();
-                while (addresses.hasMoreElements()) {
-                    InetAddress addr = addresses.nextElement();
-                    if (!addr.isLoopbackAddress() && addr.getHostAddress().indexOf(':') == -1) {
-                        return addr.getHostAddress();
+    try {
+        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+        while (interfaces.hasMoreElements()) {
+            NetworkInterface iface = interfaces.nextElement();
+            
+            // Lọc bỏ card loopback, card đang tắt hoặc card ảo
+            if (iface.isLoopback() || !iface.isUp() || iface.isVirtual()) continue;
+
+            // Bỏ qua các card mạng ảo của VMware/VirtualBox dựa trên tên hiển thị (Chống sót)
+            String displayName = iface.getDisplayName().toLowerCase();
+            if (displayName.contains("vmware") || displayName.contains("virtualbox") || displayName.contains("vbox") || displayName.contains("virtual")) {
+                continue; 
+            }
+
+            Enumeration<InetAddress> addresses = iface.getInetAddresses();
+            while (addresses.hasMoreElements()) {
+                InetAddress addr = addresses.nextElement();
+                
+                // Chỉ lấy IPv4
+                if (!addr.isLoopbackAddress() && addr.getHostAddress().indexOf(':') == -1) {
+                    String ip = addr.getHostAddress();
+                    
+                    // LÀM ĐIỀU KIỆN ƯU TIÊN: Nếu thấy dải 192 thì chốt luôn và trả về ngay
+                    if (ip.startsWith("192.")) {
+                        return ip;
                     }
                 }
             }
-            return InetAddress.getLocalHost().getHostAddress();
-        } catch (Exception e) {
-            return "127.0.0.1";
         }
+
+        // Phương án dự phòng 2: Nếu không tìm thấy dải 192 ưu tiên, thì quét lại một lượt lấy IP đầu tiên hợp lệ
+        interfaces = NetworkInterface.getNetworkInterfaces();
+        while (interfaces.hasMoreElements()) {
+            NetworkInterface iface = interfaces.nextElement();
+            if (iface.isLoopback() || !iface.isUp()) continue;
+            Enumeration<InetAddress> addresses = iface.getInetAddresses();
+            while (addresses.hasMoreElements()) {
+                InetAddress addr = addresses.nextElement();
+                if (!addr.isLoopbackAddress() && addr.getHostAddress().indexOf(':') == -1) {
+                    return addr.getHostAddress();
+                }
+            }
+        }
+        
+        return InetAddress.getLocalHost().getHostAddress();
+    } catch (Exception e) {
+        return "127.0.0.1";
     }
+}
 
     // ==========================================================
     // CƠ CHẾ TỰ ĐỘNG PHÁT HIỆN HÀNG XÓM BẰNG UDP BROADCAST
