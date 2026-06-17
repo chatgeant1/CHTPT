@@ -55,12 +55,16 @@ public class Node {
         this.myPort = myPort;
         this.sharedResource = sharedResource;
         this.myIp = localTest ? "localhost" : autoDiscoverEnvironmentIP(); 
-        
-        System.out.println(String.format("[Node %d] Đang chạy trên IP cá nhân: %s:%d", this.id, this.myIp, this.myPort));
     }
 
     public void addNeighbors(Neighbor nb){
         neighbors.add(nb);
+    }
+    public String getNodeIP(){
+        return this.myIp;
+    }
+    public int getNodeID(){
+        return this.id;
     }
 
 // ================================================================================================================================================================================================================================
@@ -349,7 +353,7 @@ public class Node {
     }
 
     private void enterCriticalSection() {
-        sharedResource.access(this.id);
+        sharedResource.access(this.id, this.clock.getTimestamp());
         this.state = State.RELEASED;
         
         System.out.println(String.format("[Node %d] Thoát CS. Giải phóng hàng đợi...", this.id));
