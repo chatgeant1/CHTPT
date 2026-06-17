@@ -50,14 +50,19 @@ public class Node {
     // Cổng UDP chung cố định cho tất cả các máy để phát hiện nhau
     private static final int DISCOVERY_PORT = 8888; 
 
-    public Node(int id, int myPort, SharedResource sharedResource) {
+    public Node(int id, int myPort, SharedResource sharedResource, boolean localTest) {
         this.id = id;
         this.myPort = myPort;
         this.sharedResource = sharedResource;
-        this.myIp = autoDiscoverEnvironmentIP(); 
+        this.myIp = localTest ? "localhost" : autoDiscoverEnvironmentIP(); 
         
         System.out.println(String.format("[Node %d] Đang chạy trên IP cá nhân: %s:%d", this.id, this.myIp, this.myPort));
     }
+
+    public void addNeighbors(Neighbor nb){
+        neighbors.add(nb);
+    }
+
 // ================================================================================================================================================================================================================================
     private String autoDiscoverEnvironmentIP() {
     try {
@@ -137,7 +142,7 @@ public class Node {
                             synchronized (neighbors) {
                                 if (!neighbors.contains(newNeighbor)) {
                                     neighbors.add(newNeighbor);
-                                    System.out.println(String.format("\n[⚡ TỰ ĐỘNG PHÁT HIỆN]: Đã tìm thấy Node %d tại địa chỉ LAN (%s:%d)", remoteId, remoteIp, remotePort));
+                                    System.out.println(String.format("\n[TỰ ĐỘNG PHÁT HIỆN]: Đã tìm thấy Node %d tại địa chỉ LAN (%s:%d)", remoteId, remoteIp, remotePort));
                                     System.out.print("Nhập lệnh (REQ để chiếm miền găng): ");
                                 }
                             }
