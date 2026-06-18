@@ -52,11 +52,11 @@ public class Node {
     // Cổng UDP chung cố định cho tất cả các máy để phát hiện nhau
     private static final int DISCOVERY_PORT = 8888; 
 
-    public Node(int id, int myPort, SharedResource sharedResource, boolean localTest) {
+    public Node(int id, String ip, int myPort, SharedResource sharedResource, boolean localTest) {
         this.id = id;
         this.myPort = myPort;
         this.sharedResource = sharedResource;
-        this.myIp = localTest ? "localhost" : autoDiscoverEnvironmentIP(); 
+        this.myIp = localTest ? "localhost" : ip; 
     }
 
     public void addNeighbors(Neighbor nb){

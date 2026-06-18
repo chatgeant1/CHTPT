@@ -13,20 +13,30 @@ public class mainClass {
 
 
         // TEST LOCAL:
-        boolean localTest = true;
+        boolean localTest = false;
+
+        // DANH SÁCH CÁC NODE THAM GIA
+        List<Node.Neighbor> allNodes = new ArrayList<>();
+        allNodes.add(new Node.Neighbor(1, "10.251.9.200", 9001));
+        allNodes.add(new Node.Neighbor(2, "10.251.9.201", 9002));
+
 
         int myId = Integer.parseInt(args[0]);
         int myPort = Integer.parseInt(args[1]);
 
+        String ip = "";
+        for (Node.Neighbor n : allNodes) {
+            if (myId == n.id) {
+                ip = n.ip;
+            }
+        }
         SharedResource sharedResource = new SharedResource(myId);
-        Node node = new Node(myId, myPort, sharedResource, localTest);     
-        
-        
-        // DANH SÁCH CÁC NODE THAM GIA
-        List<Node.Neighbor> allNodes = new ArrayList<>();
-        allNodes.add(new Node.Neighbor(1, "192.168.222.220", 9001));
-        allNodes.add(new Node.Neighbor(2, "192.168.222.67", 9002));
+        Node node = new Node(myId, ip, myPort, sharedResource, localTest);    
 
+        //  10.251.9.200
+        // "192.168.222.220"
+        // 10.251.9.201
+        // "192.168.222.67"
 
         if(localTest){ 
 
