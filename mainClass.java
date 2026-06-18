@@ -12,6 +12,7 @@ public class mainClass {
         }
 
 
+        // TEST LOCAL:
         boolean localTest = false;
 
         int myId = Integer.parseInt(args[0]);
@@ -21,13 +22,14 @@ public class mainClass {
         Node node = new Node(myId, myPort, sharedResource, localTest);     
         
         
+        // DANH SÁCH CÁC NODE THAM GIA
         List<Node.Neighbor> allNodes = new ArrayList<>();
         allNodes.add(new Node.Neighbor(1, "192.168.222.220", 9001));
         allNodes.add(new Node.Neighbor(2, "192.168.222.67", 9002));
 
         if(localTest){ 
 
-            // CÁCH CHẠY: TERMINAL: GÕ RUN1.BAT, RUN2.BAT (2 terminal)
+            // CÁCH CHẠY: MỞ 2 TERMINAL: GÕ RUN1.BAT, RUN2.BAT
             int totalNodes = 2;
             // Tự động kết nối mạng Full-Mesh theo quy ước Port = 9000 + ID
             for (int i = 1; i <= totalNodes; i++) {
@@ -39,9 +41,8 @@ public class mainClass {
         }
         else{
             
-            // CÁCH CHẠY: TERMINAL máy 1: GÕ run1.bat, máy 2: run2.bat
+            // CÁCH CHẠY: TERMINAL máy 1: GÕ run1.bat, máy 2: run2.bat, ...
             int totalNodes = 2;
-            // Tự động kết nối mạng Full-Mesh theo quy ước Port = 9000 + ID
             for (Node.Neighbor n : allNodes) {
                 if (n.id != myId) {
                     node.addNeighbors(n);
