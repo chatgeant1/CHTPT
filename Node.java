@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -201,7 +202,12 @@ public class Node {
     // ==========================================
     public void startServer() {
         Thread serverThread = new Thread(() -> {
-            try (ServerSocket serverSocket = new ServerSocket(myPort)) {
+            try (ServerSocket serverSocket = new ServerSocket()) {
+
+            // chỉ là “lắng nghe tất cả interface”
+            // Mạng public + chưa rule firewall inbound port: localhost + ko tcp từ bên ngoài vào dc 
+            // Mạng private + có rule firewall inbound port: localhost + tcp từ ngoài vào dc (mạng có password)
+            serverSocket.bind(new InetSocketAddress("0.0.0.0", myPort));
 
             System.out.println(String.format("[Node %d] Server (IP:%s) đang chạy ở port %d...", id, myIp, myPort));
 

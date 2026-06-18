@@ -22,8 +22,8 @@ public class mainClass {
         
         
         List<Node.Neighbor> allNodes = new ArrayList<>();
-        allNodes.add(new Node.Neighbor(1, "192.168.", 9001));
-        allNodes.add(new Node.Neighbor(2, "192.168.", 9002));
+        allNodes.add(new Node.Neighbor(1, "192.168.222.220", 9001));
+        allNodes.add(new Node.Neighbor(2, "192.168.222.67", 9002));
 
         if(localTest){ 
 
@@ -59,7 +59,6 @@ public class mainClass {
         
         
         System.out.println("\n=================================================");
-        System.out.println(" HỆ THỐNG ĐANG TỰ ĐỘNG DÒ TÌM THIẾT BỊ TRONG LAN... ");
         System.out.println(" Gõ 'REQ' và nhấn Enter để tranh chấp Miền Găng.");
         System.out.println("=================================================\n");
 
