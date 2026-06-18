@@ -13,7 +13,7 @@ public class mainClass {
 
 
         // TEST LOCAL:
-        boolean localTest = false;
+        boolean localTest = true;
 
         int myId = Integer.parseInt(args[0]);
         int myPort = Integer.parseInt(args[1]);

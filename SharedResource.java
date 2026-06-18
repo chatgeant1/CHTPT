@@ -18,13 +18,19 @@ public class SharedResource {
     public synchronized void accessAndModify(int currentLamportTime) {
         // Tăng giá trị tài nguyên lên
         this.sharedValue += 10; 
-        saveToFile("[Node " + nodeId + "] cập nhật trong CS | Value = " + sharedValue + " | T = " + currentLamportTime);
+        saveToFile(String.format(
+            "[LOCAL] Node %d | CS UPDATE | Value=%d | Lamport=%d",
+            nodeId, sharedValue, currentLamportTime
+        ));
     }
 
     // Hàm này dành cho các Node khác bị động gọi khi nhận được lệnh REPLICATE từ mạng
     public synchronized void passiveUpdate(int fromNodeId, int newValue) {
         this.sharedValue = newValue; // Đồng bộ giá trị theo node đang giữ CS
-        saveToFile("Đồng bộ từ Node " + fromNodeId + " | Value = " + sharedValue);
+        saveToFile(String.format(
+            "[REPL ] From Node %d | Value=%d",
+            fromNodeId, sharedValue
+        ));
     }
 
 
