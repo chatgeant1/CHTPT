@@ -70,127 +70,127 @@ public class Node {
     }
 
 // ================================================================================================================================================================================================================================
-    private String autoDiscoverEnvironmentIP() {
-    try {
-        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-        while (interfaces.hasMoreElements()) {
-            NetworkInterface iface = interfaces.nextElement();
+//     private String autoDiscoverEnvironmentIP() {
+//     try {
+//         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+//         while (interfaces.hasMoreElements()) {
+//             NetworkInterface iface = interfaces.nextElement();
             
-            // Lọc bỏ card loopback, card đang tắt hoặc card ảo
-            if (iface.isLoopback() || !iface.isUp() || iface.isVirtual()) continue;
+//             // Lọc bỏ card loopback, card đang tắt hoặc card ảo
+//             if (iface.isLoopback() || !iface.isUp() || iface.isVirtual()) continue;
 
-            // Bỏ qua các card mạng ảo của VMware/VirtualBox dựa trên tên hiển thị (Chống sót)
-            String displayName = iface.getDisplayName().toLowerCase();
-            if (displayName.contains("vmware") || displayName.contains("virtualbox") || displayName.contains("vbox") || displayName.contains("virtual")) {
-                continue; 
-            }
+//             // Bỏ qua các card mạng ảo của VMware/VirtualBox dựa trên tên hiển thị (Chống sót)
+//             String displayName = iface.getDisplayName().toLowerCase();
+//             if (displayName.contains("vmware") || displayName.contains("virtualbox") || displayName.contains("vbox") || displayName.contains("virtual")) {
+//                 continue; 
+//             }
 
-            Enumeration<InetAddress> addresses = iface.getInetAddresses();
-            while (addresses.hasMoreElements()) {
-                InetAddress addr = addresses.nextElement();
+//             Enumeration<InetAddress> addresses = iface.getInetAddresses();
+//             while (addresses.hasMoreElements()) {
+//                 InetAddress addr = addresses.nextElement();
                 
-                // Chỉ lấy IPv4
-                if (!addr.isLoopbackAddress() && addr.getHostAddress().indexOf(':') == -1) {
-                    String ip = addr.getHostAddress();
+//                 // Chỉ lấy IPv4
+//                 if (!addr.isLoopbackAddress() && addr.getHostAddress().indexOf(':') == -1) {
+//                     String ip = addr.getHostAddress();
                     
-                    // LÀM ĐIỀU KIỆN ƯU TIÊN: Nếu thấy dải 192 thì chốt luôn và trả về ngay
-                    if (ip.startsWith("192.")) {
-                        return ip;
-                    }
-                }
-            }
-        }
+//                     // LÀM ĐIỀU KIỆN ƯU TIÊN: Nếu thấy dải 192 thì chốt luôn và trả về ngay
+//                     if (ip.startsWith("192.")) {
+//                         return ip;
+//                     }
+//                 }
+//             }
+//         }
 
-        // Phương án dự phòng 2: Nếu không tìm thấy dải 192 ưu tiên, thì quét lại một lượt lấy IP đầu tiên hợp lệ
-        interfaces = NetworkInterface.getNetworkInterfaces();
-        while (interfaces.hasMoreElements()) {
+//         // Phương án dự phòng 2: Nếu không tìm thấy dải 192 ưu tiên, thì quét lại một lượt lấy IP đầu tiên hợp lệ
+//         interfaces = NetworkInterface.getNetworkInterfaces();
+//         while (interfaces.hasMoreElements()) {
 
-            NetworkInterface iface = interfaces.nextElement();
-            if (iface.isLoopback() || !iface.isUp()) continue;
+//             NetworkInterface iface = interfaces.nextElement();
+//             if (iface.isLoopback() || !iface.isUp()) continue;
 
-            Enumeration<InetAddress> addresses = iface.getInetAddresses();
-            while (addresses.hasMoreElements()) {
-                InetAddress addr = addresses.nextElement();
-                if (!addr.isLoopbackAddress() && addr.getHostAddress().indexOf(':') == -1) {
-                    return addr.getHostAddress();
-                }
-            }
+//             Enumeration<InetAddress> addresses = iface.getInetAddresses();
+//             while (addresses.hasMoreElements()) {
+//                 InetAddress addr = addresses.nextElement();
+//                 if (!addr.isLoopbackAddress() && addr.getHostAddress().indexOf(':') == -1) {
+//                     return addr.getHostAddress();
+//                 }
+//             }
 
-        }
+//         }
         
-        return InetAddress.getLocalHost().getHostAddress();
-    } catch (Exception e) {
-        return "127.0.0.1";
-    }
-}
-// ================================================================================================================================================================================================================================
-    // ==========================================================
-    // CƠ CHẾ TỰ ĐỘNG PHÁT HIỆN HÀNG XÓM BẰNG UDP BROADCAST
-    // ==========================================================
-    public void startDiscovery() {
-        // 1. Thread lắng nghe tín hiệu "Chào hỏi" từ các máy khác
-        Thread listenerThread = new Thread(() -> {
+//         return InetAddress.getLocalHost().getHostAddress();
+//     } catch (Exception e) {
+//         return "127.0.0.1";
+//     }
+// }
+// // ================================================================================================================================================================================================================================
+//     // ==========================================================
+//     // CƠ CHẾ TỰ ĐỘNG PHÁT HIỆN HÀNG XÓM BẰNG UDP BROADCAST
+//     // ==========================================================
+//     public void startDiscovery() {
+//         // 1. Thread lắng nghe tín hiệu "Chào hỏi" từ các máy khác
+//         Thread listenerThread = new Thread(() -> {
             
-            try (DatagramSocket socket = new DatagramSocket(DISCOVERY_PORT)) {
+//             try (DatagramSocket socket = new DatagramSocket(DISCOVERY_PORT)) {
 
-                System.out.println("UDP listener started on " + DISCOVERY_PORT);
-                socket.setBroadcast(true);
-                byte[] buffer = new byte[1024];
+//                 System.out.println("UDP listener started on " + DISCOVERY_PORT);
+//                 socket.setBroadcast(true);
+//                 byte[] buffer = new byte[1024];
                 
-                while (true) {
-                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-                    socket.receive(packet); // Nhận gói tin phát sóng
+//                 while (true) {
+//                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+//                     socket.receive(packet); // Nhận gói tin phát sóng
                     
-                    String message = new String(packet.getData(), 0, packet.getLength()).trim();
-                    if (message.startsWith("DISCOVER_NODE")) {
-                        // Định dạng gói tin nhận được: DISCOVER_NODE:[ID]:[PORT]
-                        String[] parts = message.split(":");
-                        int remoteId = Integer.parseInt(parts[1]);
-                        int remotePort = Integer.parseInt(parts[2]);
-                        String remoteIp = packet.getAddress().getHostAddress();
+//                     String message = new String(packet.getData(), 0, packet.getLength()).trim();
+//                     if (message.startsWith("DISCOVER_NODE")) {
+//                         // Định dạng gói tin nhận được: DISCOVER_NODE:[ID]:[PORT]
+//                         String[] parts = message.split(":");
+//                         int remoteId = Integer.parseInt(parts[1]);
+//                         int remotePort = Integer.parseInt(parts[2]);
+//                         String remoteIp = packet.getAddress().getHostAddress();
 
-                        // Nếu không phải là chính mình và chưa có trong danh sách hàng xóm thì tự động thêm vào
-                        if (remoteId != this.id) {
-                            Neighbor newNeighbor = new Neighbor(remoteId, remoteIp, remotePort);
-                            synchronized (neighbors) {
-                                if (!neighbors.contains(newNeighbor)) {
-                                    neighbors.add(newNeighbor);
-                                    System.out.println(String.format("\n[TỰ ĐỘNG PHÁT HIỆN]: Đã tìm thấy Node %d tại địa chỉ LAN (%s:%d)", remoteId, remoteIp, remotePort));
-                                    System.out.print("Nhập lệnh (REQ để chiếm miền găng): ");
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                System.err.println("Lỗi tầng dò tìm UDP: " + e.getMessage());
-            }
-        });
-        listenerThread.setDaemon(true);
-        listenerThread.start();
+//                         // Nếu không phải là chính mình và chưa có trong danh sách hàng xóm thì tự động thêm vào
+//                         if (remoteId != this.id) {
+//                             Neighbor newNeighbor = new Neighbor(remoteId, remoteIp, remotePort);
+//                             synchronized (neighbors) {
+//                                 if (!neighbors.contains(newNeighbor)) {
+//                                     neighbors.add(newNeighbor);
+//                                     System.out.println(String.format("\n[TỰ ĐỘNG PHÁT HIỆN]: Đã tìm thấy Node %d tại địa chỉ LAN (%s:%d)", remoteId, remoteIp, remotePort));
+//                                     System.out.print("Nhập lệnh (REQ để chiếm miền găng): ");
+//                                 }
+//                             }
+//                         }
+//                     }
+//                 }
+//             } catch (Exception e) {
+//                 System.err.println("Lỗi tầng dò tìm UDP: " + e.getMessage());
+//             }
+//         });
+//         listenerThread.setDaemon(true);
+//         listenerThread.start();
 
-        // 2. Thread liên tục phát sóng định kỳ để báo cho máy khác biết mình đang online
-        Thread broadcasterThread = new Thread(() -> {
-            try (DatagramSocket socket = new DatagramSocket()) {
-                socket.setBroadcast(true);
+//         // 2. Thread liên tục phát sóng định kỳ để báo cho máy khác biết mình đang online
+//         Thread broadcasterThread = new Thread(() -> {
+//             try (DatagramSocket socket = new DatagramSocket()) {
+//                 socket.setBroadcast(true);
                 
-                // Gửi thông điệp chứa ID và Port TCP của mình đi khắp mạng LAN
-                String broadcastMessage = String.format("DISCOVER_NODE:%d:%d", this.id, this.myPort);
-                byte[] buffer = broadcastMessage.getBytes();
-                InetAddress broadcastAddress = InetAddress.getByName("255.255.255.255");
+//                 // Gửi thông điệp chứa ID và Port TCP của mình đi khắp mạng LAN
+//                 String broadcastMessage = String.format("DISCOVER_NODE:%d:%d", this.id, this.myPort);
+//                 byte[] buffer = broadcastMessage.getBytes();
+//                 InetAddress broadcastAddress = InetAddress.getByName("255.255.255.255");
 
-                while (true) {
-                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length, broadcastAddress, DISCOVERY_PORT);
-                    socket.send(packet);
-                    Thread.sleep(2000); // Cứ 2 giây phát sóng một lần
-                }
-            } catch (Exception e) {
-                System.err.println("Lỗi phát sóng UDP: " + e.getMessage());
-            }
-        });
-        broadcasterThread.setDaemon(true);
-        broadcasterThread.start();
-    }
+//                 while (true) {
+//                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length, broadcastAddress, DISCOVERY_PORT);
+//                     socket.send(packet);
+//                     Thread.sleep(2000); // Cứ 2 giây phát sóng một lần
+//                 }
+//             } catch (Exception e) {
+//                 System.err.println("Lỗi phát sóng UDP: " + e.getMessage());
+//             }
+//         });
+//         broadcasterThread.setDaemon(true);
+//         broadcasterThread.start();
+//     }
 
     public int getNeighborCount() {
         synchronized(neighbors) {
