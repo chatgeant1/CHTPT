@@ -7,3 +7,5 @@
 Đồng bộ từ Node 2 | Value = 60
 [Node 1] cập nhật trong CS | Value = 70 | T = 22
 Đồng bộ từ Node 2 | Value = 80
+[Node 1] cập nhật trong CS | Value = 10 | T = 1
+[Node 1] cập nhật trong CS | Value = 10 | T = 1

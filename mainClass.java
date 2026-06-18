@@ -1,5 +1,7 @@
 
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 public class mainClass {
     public static void main(String[] args) throws Exception {
@@ -10,17 +12,22 @@ public class mainClass {
         }
 
 
-        boolean localTest = true;
+        boolean localTest = false;
 
         int myId = Integer.parseInt(args[0]);
         int myPort = Integer.parseInt(args[1]);
 
         SharedResource sharedResource = new SharedResource(myId);
-        Node node = new Node(myId, myPort, sharedResource, localTest);        
-       
+        Node node = new Node(myId, myPort, sharedResource, localTest);     
+        
+        
+        List<Node.Neighbor> allNodes = new ArrayList<>();
+        allNodes.add(new Node.Neighbor(1, "192.168.222.220", 9001));
+        allNodes.add(new Node.Neighbor(2, "192.168.222.67", 9002));
+
         if(localTest){ 
 
-            // CÁCH CHẠY: TERMINAL: GÕ RUN1.BAT, RUN2.BAT
+            // CÁCH CHẠY: TERMINAL: GÕ RUN1.BAT, RUN2.BAT (2 terminal)
             int totalNodes = 2;
             // Tự động kết nối mạng Full-Mesh theo quy ước Port = 9000 + ID
             for (int i = 1; i <= totalNodes; i++) {
@@ -31,10 +38,21 @@ public class mainClass {
              node.startServer();
         }
         else{
-            // 1. Kích hoạt Server TCP để nhận tin nhắn thuật toán Ricart-Agrawala
+            
+            // CÁCH CHẠY: TERMINAL máy 1: GÕ run1.bat, máy 2: run2.bat
+            int totalNodes = 2;
+            // Tự động kết nối mạng Full-Mesh theo quy ước Port = 9000 + ID
+            for (Node.Neighbor n : allNodes) {
+                if (n.id != myId) {
+                    node.addNeighbors(n);
+                }
+            }
+
+             // 1. Kích hoạt Server TCP để nhận tin nhắn thuật toán Ricart-Agrawala
              node.startServer();
             // 2. Kích hoạt Server UDP Auto-Discovery tự quét tìm hàng xóm
-            node.startDiscovery();
+            // node.startDiscovery();
+
         }
 
         
