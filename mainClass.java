@@ -27,6 +27,7 @@ public class mainClass {
         allNodes.add(new Node.Neighbor(1, "192.168.222.220", 9001));
         allNodes.add(new Node.Neighbor(2, "192.168.222.67", 9002));
 
+
         if(localTest){ 
 
             // CÁCH CHẠY: MỞ 2 TERMINAL: GÕ RUN1.BAT, RUN2.BAT
@@ -42,7 +43,7 @@ public class mainClass {
         else{
             
             // CÁCH CHẠY: TERMINAL máy 1: GÕ run1.bat, máy 2: run2.bat, ...
-            int totalNodes = 2;
+            // int totalNodes = 2;
             for (Node.Neighbor n : allNodes) {
                 if (n.id != myId) {
                     node.addNeighbors(n);

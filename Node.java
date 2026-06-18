@@ -130,9 +130,10 @@ public class Node {
     public void startDiscovery() {
         // 1. Thread lắng nghe tín hiệu "Chào hỏi" từ các máy khác
         Thread listenerThread = new Thread(() -> {
-
+            
             try (DatagramSocket socket = new DatagramSocket(DISCOVERY_PORT)) {
 
+                System.out.println("UDP listener started on " + DISCOVERY_PORT);
                 socket.setBroadcast(true);
                 byte[] buffer = new byte[1024];
                 
