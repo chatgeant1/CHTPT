@@ -20,3 +20,46 @@
 [LOCAL] Node 2 | CS UPDATE | Value=20 | Lamport=7
 [REPL ] From Node 1 | Value=30
 [LOCAL] Node 2 | CS UPDATE | Value=40 | Lamport=13
+[REPL ] From Node 1 | Value=10
+[LOCAL] Node 2 | CS UPDATE | Value=20 | Lamport=7
+[LOCAL] Node 2 | CS UPDATE | Value=30 | Lamport=11
+[REPL ] From Node 1 | Value=40
+[REPL ] From Node 1 | Value=50
+[LOCAL] Node 2 | CS UPDATE | Value=60 | Lamport=21
+[REPL ] From Node 1 | Value=70
+[REPL ] From Node 1 | Value=10
+[LOCAL] Node 2 | CS UPDATE | Value=20 | Lamport=29
+[REPL ] From Node 1 | Value=30
+[LOCAL] Node 2 | CS UPDATE | Value=40 | Lamport=35
+[LOCAL] Node 2 | CS UPDATE | Value=50 | Lamport=39
+[REPL ] From Node 1 | Value=60
+[REPL ] From Node 1 | Value=70
+[REPL ] From Node 1 | Value=10
+[LOCAL] Node 2 | CS UPDATE | Value=20 | Lamport=7
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=4
+[REPL ] From Node 1 | Value=20
+[LOCAL] Node 2 | CS UPDATE | Value=30 | Lamport=10
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=12
+[LOCAL] Node 2 | CS UPDATE | Value=20 | Lamport=16
+[LOCAL] Node 2 | CS UPDATE | Value=30 | Lamport=20
+[REPL ] From Node 1 | Value=40
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=26
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=28
+[REPL ] From Node 1 | Value=20
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=34
+[REPL ] From Node 1 | Value=20
+[LOCAL] Node 2 | CS UPDATE | Value=30 | Lamport=40
+[REPL ] From Node 1 | Value=40
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=4
+[LOCAL] Node 2 | CS UPDATE | Value=20 | Lamport=8
+[REPL ] From Node 1 | Value=30
+[LOCAL] Node 2 | CS UPDATE | Value=40 | Lamport=14
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=16
+[LOCAL] Node 2 | CS UPDATE | Value=20 | Lamport=20
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=22
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=24
+[LOCAL] Node 2 | CS UPDATE | Value=20 | Lamport=28
+[LOCAL] Node 2 | CS UPDATE | Value=30 | Lamport=32
+[LOCAL] Node 2 | CS UPDATE | Value=40 | Lamport=36
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=38
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=4
