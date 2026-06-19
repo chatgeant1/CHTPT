@@ -35,71 +35,91 @@ public class AppGUI extends JFrame {
         getContentPane().setBackground(COLOR_BG_DARK);
         setLayout(new BorderLayout(10, 10));
 
-        // =================================================================
-        // HỆ THỐNG HEADER (Thanh trên cùng)
-        // =================================================================
+// =================================================================
+// HỆ THỐNG HEADER (Thanh trên cùng)
+// =================================================================
         JPanel panelHeader = new JPanel(new BorderLayout());
         panelHeader.setBackground(COLOR_CARD_BG);
         panelHeader.setBorder(new EmptyBorder(10, 15, 10, 15));
         
+        // Tiêu đề bên trái
         JLabel lblTitle = new JLabel("Ricart & Agrawala — Mutual Exclusion", SwingConstants.LEFT);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitle.setForeground(COLOR_TEXT_LIGHT);
+        // Đặt tiêu đề ở bên trái của header.
         panelHeader.add(lblTitle, BorderLayout.WEST);
 
+        // Tạo cụm bên phải (các thành phần được xếp từ trái sang phải nhưng dồn về phía phải)
         JPanel panelHeaderRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
         panelHeaderRight.setBackground(COLOR_CARD_BG);
+        // Label đồng hồ logic
         lblGlobalClock = new JLabel("clock = 0");
-        lblGlobalClock.setFont(new Font("Consolas", Font.BOLD, 14));
+        lblGlobalClock.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblGlobalClock.setForeground(COLOR_TEXT_LIGHT);
         
+        // Label trạng thái (badge) (Mặc định JLabel trong suốt)
         lblStatusBadge = new JLabel(" Idle ", SwingConstants.CENTER);
         lblStatusBadge.setOpaque(true);
         lblStatusBadge.setBackground(new Color(60, 60, 65));
         lblStatusBadge.setForeground(Color.WHITE);
-        lblStatusBadge.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblStatusBadge.setFont(new Font("Segoe UI", Font.BOLD, 18));
         
+        // Đưa 2 label clock và badge vào panel phải
+        // [đổi vùng phải, đưa lên header] thêm nút req
+        btnRequest = createModernButton("Yêu cầu vào Miền Găng", COLOR_ACCENT);
+        btnRequest.setPreferredSize(new Dimension(220, 36));
+        panelHeaderRight.add(btnRequest);
+
         panelHeaderRight.add(lblGlobalClock);
         panelHeaderRight.add(lblStatusBadge);
+
+        // Đưa panel phải vào header
         panelHeader.add(panelHeaderRight, BorderLayout.EAST);
+
+        // Đưa header lên cửa sổ chính
         add(panelHeader, BorderLayout.NORTH);
 
-        // =================================================================
-        // KHU VỰC TRÁI: ĐỒ HỌA MẠNG MÔ PHỎNG (GRAPH CANVAS)
-        // =================================================================
+// =================================================================
+// KHU VỰC TRÁI: ĐỒ HỌA MẠNG MÔ PHỎNG (GRAPH CANVAS)
+// =================================================================
+        // Tạo panel bên trái của giao diện.
         JPanel panelLeftContainer = new JPanel(new BorderLayout());
         panelLeftContainer.setBackground(COLOR_BG_DARK);
         panelLeftContainer.setBorder(new EmptyBorder(0, 10, 10, 5));
 
+        // Khu vực vẽ mạng - Tạo đối tượng đồ họa tự viết.
         panelGraph = new GraphPanel();
+        // Đặt vùng vẽ chiếm gần như toàn bộ diện tích panel trái.
         panelLeftContainer.add(panelGraph, BorderLayout.CENTER);
 
-        // Thanh chú thích màu sắc ở dưới cùng đồ họa
+        // Thanh chú thích (legend) màu sắc ở dưới cùng đồ họa
         JPanel panelLegend = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 8));
         panelLegend.setBackground(COLOR_BG_DARK);
         panelLegend.add(createLegendItem("Hoạt động ổn định", new Color(81, 103, 230)));
         panelLegend.add(createLegendItem("Muốn vào CS (WANTED)", new Color(218, 165, 32)));
         panelLegend.add(createLegendItem("Trong CS (HELD)", new Color(198, 40, 40)));
+        
         panelLeftContainer.add(panelLegend, BorderLayout.SOUTH);
         
+        // Đưa toàn bộ khu trái vào cửa sổ
         add(panelLeftContainer, BorderLayout.CENTER);
 
-        // =================================================================
-        // KHU VỰC PHẢI: BẢNG ĐIỀU KHIỂN & SỐ LIỆU (TỐI ƯU KHÔNG GIAN)
-        // =================================================================
+// =================================================================
+// KHU VỰC PHẢI: BẢNG ĐIỀU KHIỂN & SỐ LIỆU (TỐI ƯU KHÔNG GIAN)
+// =================================================================
         JPanel panelRightContainer = new JPanel(new VerticalLayout(12));
         panelRightContainer.setBackground(COLOR_BG_DARK);
         panelRightContainer.setPreferredSize(new Dimension(450, 0)); 
         panelRightContainer.setBorder(new EmptyBorder(0, 5, 10, 10));
 
         // 1. Khung Nút Bấm Gửi Yêu Cầu
-        JPanel panelControls = createCardPanel("HÀNH ĐỘNG");
-        panelControls.setLayout(new BorderLayout(0, 5));
+        // JPanel panelControls = createCardPanel("HÀNH ĐỘNG");
+        // panelControls.setLayout(new BorderLayout(0, 5));
         
-        btnRequest = createModernButton("Yêu cầu vào Miền Găng (REQ)", COLOR_ACCENT);
-        btnRequest.setPreferredSize(new Dimension(0, 45)); 
-        panelControls.add(btnRequest, BorderLayout.CENTER);
-        panelRightContainer.add(panelControls);
+        // btnRequest = createModernButton("Yêu cầu vào Miền Găng (REQ)", COLOR_ACCENT);
+        // btnRequest.setPreferredSize(new Dimension(0, 45)); 
+        // panelControls.add(btnRequest, BorderLayout.CENTER);
+        // panelRightContainer.add(panelControls);
 
         // 2. Khung Trạng Thái Tiến Trình (MỞ RỘNG)
         JPanel panelTableCard = createCardPanel("TRẠNG THÁI TIẾN TRÌNH TRONG MẠNG");
@@ -112,6 +132,9 @@ public class AppGUI extends JFrame {
         tableStatus.getTableHeader().setBackground(new Color(45, 45, 50));
         tableStatus.getTableHeader().setForeground(COLOR_TEXT_LIGHT);
         tableStatus.setGridColor(new Color(50, 50, 55));
+        
+        // Dòng này làm JTable kéo dài hết viewport
+        tableStatus.setFillsViewportHeight(true);
         
         tableStatus.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         tableStatus.getColumnModel().getColumn(0).setPreferredWidth(40);   
@@ -135,7 +158,7 @@ public class AppGUI extends JFrame {
         // 3. Khung Bước Hiện Tại
         JPanel panelStepCard = createCardPanel("BƯỚC HIỆN TẠI");
         lblCurrentStep = new JLabel("Hệ thống đang hoạt động ổn định. Đang nghe kết nối mạng...");
-        lblCurrentStep.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblCurrentStep.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblCurrentStep.setForeground(new Color(138, 180, 248));
         panelStepCard.add(lblCurrentStep, BorderLayout.CENTER);
         panelRightContainer.add(panelStepCard);
@@ -146,10 +169,15 @@ public class AppGUI extends JFrame {
         txtLogs.setEditable(false);
         txtLogs.setBackground(new Color(24, 24, 27));
         txtLogs.setForeground(new Color(170, 170, 180));
-        txtLogs.setFont(new Font("Consolas", Font.PLAIN, 12));
+        txtLogs.setFont(new Font("Consolas", Font.PLAIN, 16));
         txtLogs.setMargin(new Insets(6, 6, 6, 6));
+
+        // xuống dòng
+        txtLogs.setLineWrap(true);
+        txtLogs.setWrapStyleWord(true);
+
         JScrollPane scrollLogs = new JScrollPane(txtLogs);
-        scrollLogs.setPreferredSize(new Dimension(420, 280)); 
+        scrollLogs.setPreferredSize(new Dimension(420, 350)); 
         scrollLogs.setBorder(BorderFactory.createEmptyBorder());
         
         // Đồng bộ luôn nền đen cho hộp cuộn của nhật ký sự kiện
@@ -173,10 +201,18 @@ public class AppGUI extends JFrame {
         if (node != null) {
             String myIpPort = node.getNodeIP() + ":" + (9000 + node.getNodeID());
             tableModel.addRow(new Object[]{"P" + node.getNodeID(), myIpPort, "RELEASED", "0", "0/0", "Empty"});
+
+            for (Node.Neighbor n : node.neighbors){
+                tableModel.addRow(
+                    new Object[]{
+                        "P" + n.getId(), n.ip + ":" + n.getPort(), "ONLINE", "-", "-", "-"
+                    }
+                );
+            }
         }
     }
 
-    public void updateUI(String state, int clockValue, int currentReply, int totalNeighbors, int sharedVal) {
+    public void updateUI(String state, int clockValue, int currentReply, int totalNeighbors, int sharedVal, String queueText) {
         SwingUtilities.invokeLater(() -> {
             lblGlobalClock.setText("clock=" + clockValue);
             lblStatusBadge.setText(" " + state + " ");
@@ -187,7 +223,7 @@ public class AppGUI extends JFrame {
                 lblStatusBadge.setBackground(new Color(46, 139, 87));
                 lblCurrentStep.setText("Tiến trình giải phóng Miền Găng. Giá trị tài nguyên: " + sharedVal);
                 btnRequest.setEnabled(true);
-                btnRequest.setText("Yêu cầu vào Miền Găng (REQ)");
+                btnRequest.setText("Yêu cầu vào Miền Găng");
             } else if (state.equals("WANTED")) {
                 lblStatusBadge.setBackground(new Color(218, 165, 32));
                 lblCurrentStep.setText("P" + myId + " muốn vào CS với mốc T=" + clockValue + ". Chờ REPLY...");
@@ -201,6 +237,7 @@ public class AppGUI extends JFrame {
             tableModel.setValueAt(state, 0, 2);
             tableModel.setValueAt(String.valueOf(clockValue), 0, 3);
             tableModel.setValueAt(currentReply + "/" + totalNeighbors, 0, 4);
+            tableModel.setValueAt(queueText, 0, 5);
 
             panelGraph.setNodeState(state);
         });
@@ -208,7 +245,7 @@ public class AppGUI extends JFrame {
 
     public void appendLog(String message) {
         SwingUtilities.invokeLater(() -> {
-            String prefix = message.contains("REQUEST") ? "-> REQ  " : (message.contains("REPLY") ? " <- REPLY " : "INFO   ");
+            String prefix = message.contains("REQUEST") ? "\n-> REQ\n" : (message.contains("REPLY") ? "\n<- REPLY\n" : "\nINFO\n");
             txtLogs.append(prefix + message + "\n");
             txtLogs.setCaretPosition(txtLogs.getDocument().getLength());
 
@@ -255,6 +292,15 @@ public class AppGUI extends JFrame {
             if (node != null) {
                 activeNodes.add(node.getNodeID());
                 nodeIpMap.put(node.getNodeID(), node.getNodeIP() + ":" + (9000 + node.getNodeID()));
+
+                for (Node.Neighbor n : node.neighbors) {
+                    activeNodes.add(n.getId());          
+                    nodeIpMap.put(
+                        n.getId(),                       
+                        n.getIp() + ":" + n.getPort()    
+                    );
+                }
+
             } else {
                 activeNodes.add(2);
                 nodeIpMap.put(2, "10.251.2.110:9002");
@@ -384,7 +430,7 @@ public class AppGUI extends JFrame {
         dot.setPreferredSize(new Dimension(10, 10));
         dot.setBackground(COLOR_BG_DARK);
         JLabel lbl = new JLabel(text);
-        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lbl.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lbl.setForeground(COLOR_TEXT_MUTED);
         p.add(dot); p.add(lbl);
         return p;

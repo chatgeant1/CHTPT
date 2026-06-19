@@ -12,11 +12,22 @@ public class mainClass {
 
         // TEST LOCAL:
         boolean localTest = false;
+        
+        String IP1 = localTest ? "localhost" : "localhost";
+        String IP2 = localTest ? "localhost" : "localhost";
+        String IP3 = localTest ? "localhost" : "localhost";
+        String IP4 = localTest ? "localhost" : "localhost";
+        String IP5 = localTest ? "localhost" : "localhost";
+        String IP6 = localTest ? "localhost" : "localhost";
 
         // DANH SÁCH CÁC NODE THAM GIA
         List<Node.Neighbor> allNodes = new ArrayList<>();
-        allNodes.add(new Node.Neighbor(1, "192.168.222.220", 9001));
-        allNodes.add(new Node.Neighbor(2, "192.168.222.101", 9002));
+        allNodes.add(new Node.Neighbor(1, IP1, 9001));
+        allNodes.add(new Node.Neighbor(2, IP2, 9002));
+        allNodes.add(new Node.Neighbor(3, IP3, 9003));
+        allNodes.add(new Node.Neighbor(4, IP4, 9004));
+        allNodes.add(new Node.Neighbor(5, IP5, 9005));
+        allNodes.add(new Node.Neighbor(6, IP6, 9006));
 
         int myId = Integer.parseInt(args[0]);
         int myPort = Integer.parseInt(args[1]);
@@ -29,31 +40,18 @@ public class mainClass {
         }
         SharedResource sharedResource = new SharedResource(myId);
         Node node = new Node(myId, ip, myPort, sharedResource, localTest);    
-
-        if (localTest) { 
-            // CÁCH CHẠY: MỞ 2 TERMINAL: GÕ RUN1.BAT, RUN2.BAT
-            int totalNodes = 2;
-            // Tự động kết nối mạng Full-Mesh theo quy ước Port = 9000 + ID
-            for (int i = 1; i <= totalNodes; i++) {
-                if (i != myId) {
-                    node.addNeighbors(new Node.Neighbor(i, "localhost", 9000+i));
-                }
+        
+        // CÁCH CHẠY: TERMINAL máy 1: GÕ run1.bat, máy 2: run2.bat, ...
+        for (Node.Neighbor n : allNodes) {
+            if (n.id != myId) {
+                node.addNeighbors(n);
             }
-            node.startServer();
         }
-        else {
-            // CÁCH CHẠY: TERMINAL máy 1: GÕ run1.bat, máy 2: run2.bat, ...
-            for (Node.Neighbor n : allNodes) {
-                if (n.id != myId) {
-                    node.addNeighbors(n);
-                }
-            }
 
-            // 1. Kích hoạt Server TCP để nhận tin nhắn thuật toán Ricart-Agrawala
-            node.startServer();
-            // 2. Kích hoạt Server UDP Auto-Discovery tự quét tìm hàng xóm
-            // node.startDiscovery();
-        }
+        // Kích hoạt Server TCP để nhận tin nhắn thuật toán Ricart-Agrawala
+        node.startServer();
+
+        
 
         // =========================================================
         // KHỞI CHẠY CỬA SỔ GIAO DIỆN GUI

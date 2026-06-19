@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Node {
     public enum State { RELEASED, WANTED, HELD }
@@ -34,13 +35,18 @@ public class Node {
             }
             return false;
         }
+
+        public int getId() { return id; }
+        public String getIp() { return ip; }
+        public int getPort() { return port; }
+
     }
 
     private final int id;
     private final String myIp; 
     private final int myPort;
 
-    private final List<Neighbor> neighbors = new ArrayList<>();
+    public final List<Neighbor> neighbors = new ArrayList<>();
     private final LamportClock clock = new LamportClock();
     private final SharedResource sharedResource;
 
@@ -59,9 +65,16 @@ public class Node {
         triggerGuiUpdate();
     }
 
+
     private void triggerGuiUpdate() {
         if (this.gui != null) {
-            this.gui.updateUI(this.state.toString(), this.clock.getTimestamp(), this.replyCount, getNeighborCount(), sharedResource.getSharedValue());
+            String queueText = deferredQueue.isEmpty()
+            ? "Empty"
+            : deferredQueue.stream()
+                .map(n -> "P" + n.id)
+                .collect(Collectors.joining(","));
+                
+            this.gui.updateUI(this.state.toString(), this.clock.getTimestamp(), this.replyCount, getNeighborCount(), sharedResource.getSharedValue(), queueText);
         }
     }
 
@@ -302,7 +315,7 @@ public class Node {
 
         triggerGuiUpdate();
 
-        logToBoth(String.format("\n[Node %d] TRẠNG THÁI: WANTED (T_req=%d)", this.id, this.myRequestTimestamp));
+        logToBoth(String.format("[Node %d] TRẠNG THÁI: WANTED (T_req=%d)", this.id, this.myRequestTimestamp));
 
         synchronized (neighbors) {
             if (neighbors.isEmpty()) {
@@ -315,7 +328,7 @@ public class Node {
             // Duyệt danh sách, gửi request tới từng hàng xóm 
             String msg = String.format("REQUEST,%d,%s,%d,%d", this.id, this.myIp, this.myPort, myRequestTimestamp);
             for (Neighbor neighbor : neighbors) {
-                logToBoth(String.format("\n[Node %d] ---> GỬI REQUEST (T=%d, id=%d) tới Node %d:%s:%d", this.id, this.myRequestTimestamp, this.id, neighbor.id, neighbor.ip, neighbor.port));
+                logToBoth(String.format("[Node %d] ---> GỬI REQUEST (T=%d, id=%d) tới Node %d:%s:%d", this.id, this.myRequestTimestamp, this.id, neighbor.id, neighbor.ip, neighbor.port));
                 new Thread(() -> sendMessageViaSocket(neighbor.ip, neighbor.port, msg)).start();
             }
         }
@@ -354,6 +367,8 @@ public class Node {
             if (!deferredQueue.contains(sender)) {
                 deferredQueue.add(sender);
             }
+
+            triggerGuiUpdate();
 
             // In danh sách hàng đợi:
             sb.append(String.format("[Node %d] Hàng đợi: ", this.id));
@@ -398,6 +413,8 @@ public class Node {
         clock.update(senderTimestamp);
         replyCount++;
         
+        triggerGuiUpdate();
+
         int totalNeighbors = 0;
         synchronized(neighbors) { totalNeighbors = neighbors.size(); }
 
@@ -414,7 +431,8 @@ public class Node {
     private void enterCriticalSection() {
         this.state = State.HELD; 
         triggerGuiUpdate();
-        logToBoth(String.format("\n>>> [ENTER] Node %d bắt đầu độc chiếm tài nguyên", this.id));
+
+        logToBoth(String.format(">>> [ENTER] Node %d bắt đầu độc chiếm tài nguyên", this.id));
         
         // 1. Thay đổi dữ liệu trên chính máy mình
         sharedResource.accessAndModify(this.clock.getTimestamp());
@@ -428,7 +446,7 @@ public class Node {
         }
 
         // Giả lập làm việc trong CS 2 giây
-        try { Thread.sleep(5000); } catch (InterruptedException e) {}
+        try { Thread.sleep(7000); } catch (InterruptedException e) {}
 
         logToBoth(String.format("<<< [EXIT] Node %d rời miền găng.", this.id));
 
@@ -439,6 +457,8 @@ public class Node {
         List<Neighbor> toRelease = new ArrayList<>(deferredQueue);
         deferredQueue.clear(); 
         
+        triggerGuiUpdate();
+
         for (Neighbor neighbor : toRelease) {
             logToBoth(String.format("[Node %d] ---> TRẢ NỢ REPLY cho Node %d tại (%s:%d)", this.id, neighbor.id, neighbor.ip, neighbor.port));
             sendReply(neighbor);
