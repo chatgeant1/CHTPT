@@ -103,7 +103,7 @@ public class AppGUI extends JFrame {
 
         // 2. Khung Trạng Thái Tiến Trình (MỞ RỘNG)
         JPanel panelTableCard = createCardPanel("TRẠNG THÁI TIẾN TRÌNH TRONG MẠNG");
-        String[] columns = {"P", "Địa chỉ Host:Port thực tế", "Trạng thái", "Clock", "Reply", "Queue"};
+        String[] columns = {"P", "Host:Port", "Trạng thái", "Clock", "Reply", "Queue"};
         tableModel = new DefaultTableModel(columns, 0);
         tableStatus = new JTable(tableModel);
         tableStatus.setBackground(COLOR_CARD_BG);
@@ -115,7 +115,7 @@ public class AppGUI extends JFrame {
         
         tableStatus.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         tableStatus.getColumnModel().getColumn(0).setPreferredWidth(40);   
-        tableStatus.getColumnModel().getColumn(1).setPreferredWidth(165);  
+        tableStatus.getColumnModel().getColumn(1).setPreferredWidth(130);  
         tableStatus.getColumnModel().getColumn(2).setPreferredWidth(85);   
         tableStatus.getColumnModel().getColumn(3).setPreferredWidth(50);   
         tableStatus.getColumnModel().getColumn(4).setPreferredWidth(55);   
@@ -124,6 +124,11 @@ public class AppGUI extends JFrame {
         JScrollPane scrollTable = new JScrollPane(tableStatus);
         scrollTable.setPreferredSize(new Dimension(420, 160)); 
         scrollTable.setBorder(BorderFactory.createEmptyBorder());
+        
+        // ĐÃ SỬA: Nhuộm đen phần nền trống của bảng cuộn
+        scrollTable.setBackground(COLOR_CARD_BG);
+        scrollTable.getViewport().setBackground(COLOR_CARD_BG);
+        
         panelTableCard.add(scrollTable, BorderLayout.CENTER);
         panelRightContainer.add(panelTableCard);
 
@@ -146,6 +151,11 @@ public class AppGUI extends JFrame {
         JScrollPane scrollLogs = new JScrollPane(txtLogs);
         scrollLogs.setPreferredSize(new Dimension(420, 280)); 
         scrollLogs.setBorder(BorderFactory.createEmptyBorder());
+        
+        // Đồng bộ luôn nền đen cho hộp cuộn của nhật ký sự kiện
+        scrollLogs.setBackground(new Color(24, 24, 27));
+        scrollLogs.getViewport().setBackground(new Color(24, 24, 27));
+        
         panelLogCard.add(scrollLogs, BorderLayout.CENTER);
         panelRightContainer.add(panelLogCard);
 
@@ -198,13 +208,13 @@ public class AppGUI extends JFrame {
 
     public void appendLog(String message) {
         SwingUtilities.invokeLater(() -> {
-            String prefix = message.contains("REQUEST") ? "▶ REQ  " : (message.contains("REPLY") ? "◀ REPLY " : "INFO   ");
+            String prefix = message.contains("REQUEST") ? "-> REQ  " : (message.contains("REPLY") ? " <- REPLY " : "INFO   ");
             txtLogs.append(prefix + message + "\n");
             txtLogs.setCaretPosition(txtLogs.getDocument().getLength());
 
-            extractAndDiscover(message, 1);
-            extractAndDiscover(message, 2);
-            extractAndDiscover(message, 3);
+            for (int id = 1; id <= 10; id++) {
+                extractAndDiscover(message, id);
+            }
         });
     }
 
@@ -231,11 +241,11 @@ public class AppGUI extends JFrame {
     }
 
     // =================================================================
-    // LỚP VẼ ĐỒ HỌA MẠNG DỰA TRÊN CÁC NODE THỰC TẾ ONLINE
+    // LỚP VẼ ĐỒ HỌA MẠNG TỰ ĐỘNG CHIA GÓC (HỖ TRỢ LÊN TỚI N MÁY)
     // =================================================================
     private class GraphPanel extends JPanel {
         private String currentState = "RELEASED";
-        private java.util.Set<Integer> activeNodes = new java.util.HashSet<>();
+        private java.util.Set<Integer> activeNodes = new java.util.TreeSet<>(); 
         private java.util.Map<Integer, String> nodeIpMap = new java.util.HashMap<>();
 
         public GraphPanel() {
@@ -286,12 +296,6 @@ public class AppGUI extends JFrame {
             int centerY = height / 2;
             int radius = Math.min(width, height) / 3;
 
-            int[][] positions = {
-                {centerX, centerY - radius},                            
-                {centerX + (int)(radius * 0.86), centerY + radius / 2},   
-                {centerX - (int)(radius * 0.86), centerY + radius / 2}    
-            };
-
             int myId = (node != null) ? node.getNodeID() : 2;
 
             if (activeNodes.size() > 1) {
@@ -300,15 +304,13 @@ public class AppGUI extends JFrame {
                 g2.drawOval(centerX - radius, centerY - radius, radius * 2, radius * 2);
             }
 
-            for (int i = 0; i < 3; i++) {
-                int currNodeId = i + 1;
+            int totalNodes = activeNodes.size();
+            int index = 0;
 
-                if (!activeNodes.contains(currNodeId)) {
-                    continue;
-                }
-
-                int x = positions[i][0];
-                int y = positions[i][1];
+            for (int currNodeId : activeNodes) {
+                double angle = -Math.PI / 2 + (index * 2 * Math.PI / totalNodes);
+                int x = centerX + (int) (radius * Math.cos(angle));
+                int y = centerY + (int) (radius * Math.sin(angle));
                 int nodeSize = 55;
 
                 Color nodeColor = new Color(81, 103, 230); 
@@ -336,13 +338,13 @@ public class AppGUI extends JFrame {
                 g2.setFont(new Font("Consolas", Font.PLAIN, 10));
                 g2.setColor(COLOR_TEXT_MUTED);
                 
-                // ĐÃ SỬA: Lấy chính xác IP thật từ map để vẽ nhãn chữ dưới hình tròn
                 String hostLabel = nodeIpMap.get(currNodeId);
                 if (hostLabel == null) {
                     hostLabel = "10.251.2." + (100 + currNodeId) + ":" + (9000 + currNodeId);
                 }
                 
                 g2.drawString(hostLabel, x - g2.getFontMetrics().stringWidth(hostLabel) / 2, y + nodeSize / 2 + 15);
+                index++;
             }
         }
     }

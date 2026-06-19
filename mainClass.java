@@ -15,8 +15,8 @@ public class mainClass {
 
         // DANH SÁCH CÁC NODE THAM GIA
         List<Node.Neighbor> allNodes = new ArrayList<>();
-        allNodes.add(new Node.Neighbor(1, "10.251.2.120", 9001));
-        allNodes.add(new Node.Neighbor(2, "10.251.2.110", 9002));
+        allNodes.add(new Node.Neighbor(1, "192.168.222.220", 9001));
+        allNodes.add(new Node.Neighbor(2, "192.168.222.101", 9002));
 
         int myId = Integer.parseInt(args[0]);
         int myPort = Integer.parseInt(args[1]);

@@ -63,3 +63,21 @@
 [LOCAL] Node 2 | CS UPDATE | Value=40 | Lamport=36
 [LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=38
 [LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=4
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=4
+[REPL ] From Node 1 | Value=10
+[LOCAL] Node 2 | CS UPDATE | Value=20 | Lamport=7
+[REPL ] From Node 1 | Value=30
+[LOCAL] Node 2 | CS UPDATE | Value=40 | Lamport=13
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=4
+[REPL ] From Node 1 | Value=20
+[LOCAL] Node 2 | CS UPDATE | Value=30 | Lamport=10
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=12
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=14
+[LOCAL] Node 2 | CS UPDATE | Value=20 | Lamport=18
+[LOCAL] Node 2 | CS UPDATE | Value=30 | Lamport=22
+[LOCAL] Node 2 | CS UPDATE | Value=40 | Lamport=26
+[REPL ] From Node 1 | Value=50
+[LOCAL] Node 2 | CS UPDATE | Value=60 | Lamport=32
+[LOCAL] Node 2 | CS UPDATE | Value=70 | Lamport=36
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=38
+[LOCAL] Node 2 | CS UPDATE | Value=10 | Lamport=40
