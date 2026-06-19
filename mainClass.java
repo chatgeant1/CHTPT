@@ -1,4 +1,3 @@
-
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,20 +10,13 @@ public class mainClass {
             System.exit(1);
         }
 
-
         // TEST LOCAL:
         boolean localTest = false;
 
         // DANH SÁCH CÁC NODE THAM GIA
-        //  10.251.9.200
-        // "192.168.222.220"
-        // 10.251.9.201
-        // "192.168.222.67"
         List<Node.Neighbor> allNodes = new ArrayList<>();
         allNodes.add(new Node.Neighbor(1, "10.251.9.200", 9001));
         allNodes.add(new Node.Neighbor(2, "10.251.9.215", 9002));
-        
-
 
         int myId = Integer.parseInt(args[0]);
         int myPort = Integer.parseInt(args[1]);
@@ -38,9 +30,7 @@ public class mainClass {
         SharedResource sharedResource = new SharedResource(myId);
         Node node = new Node(myId, ip, myPort, sharedResource, localTest);    
 
-
-        if(localTest){ 
-
+        if (localTest) { 
             // CÁCH CHẠY: MỞ 2 TERMINAL: GÕ RUN1.BAT, RUN2.BAT
             int totalNodes = 2;
             // Tự động kết nối mạng Full-Mesh theo quy ước Port = 9000 + ID
@@ -49,49 +39,59 @@ public class mainClass {
                     node.addNeighbors(new Node.Neighbor(i, "localhost", 9000+i));
                 }
             }
-             node.startServer();
+            node.startServer();
         }
-        else{
-            
+        else {
             // CÁCH CHẠY: TERMINAL máy 1: GÕ run1.bat, máy 2: run2.bat, ...
-            // int totalNodes = 2;
             for (Node.Neighbor n : allNodes) {
                 if (n.id != myId) {
                     node.addNeighbors(n);
                 }
             }
 
-             // 1. Kích hoạt Server TCP để nhận tin nhắn thuật toán Ricart-Agrawala
-             node.startServer();
+            // 1. Kích hoạt Server TCP để nhận tin nhắn thuật toán Ricart-Agrawala
+            node.startServer();
             // 2. Kích hoạt Server UDP Auto-Discovery tự quét tìm hàng xóm
             // node.startDiscovery();
-
         }
 
+        // =========================================================
+        // KHỞI CHẠY CỬA SỔ GIAO DIỆN GUI
+        // =========================================================
+        System.out.println("\n>>> ĐANG KHỞI CHẠY GIAO DIỆN GUI CHO NODE " + myId + "...");
         
-        
-        
-        System.out.println("\n=================================================");
-        System.out.println(" Gõ 'REQ' và nhấn Enter để tranh chấp Miền Găng.");
-        System.out.println("=================================================\n");
-
-        // Vòng lặp đọc lệnh từ bàn phím Terminal
-        Scanner scanner = new Scanner(System.in);
-        while (scanner.hasNextLine()) {
-            String command = scanner.nextLine().trim();
-            if (command.equalsIgnoreCase("REQ")) {
-            // Tạo một Thread chạy ngầm để đi yêu cầu quyền vào miền găng, không làm treo bàn phím
-               new Thread(() -> node.requestCriticalSection()).start();
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            try {
+                AppGUI gui = new AppGUI(node);
+                node.setGUI(gui); // Gắn giao diện vào node backend để nhận diện nhau
+                gui.setVisible(true); // Bật cửa sổ app lên
+            } catch (Exception e) {
+                System.err.println("Lỗi khởi chạy giao diện: " + e.getMessage());
             }
-            else if (command.equalsIgnoreCase("EXIT")){
-                scanner.close();
-                System.exit(0);
+        });
+
+        // =========================================================
+        // ĐƯA SCANNER VÀO THREAD RIÊNG (Tránh làm đóng băng giao diện)
+        // =========================================================
+        new Thread(() -> {
+            System.out.println("\n=================================================");
+            System.out.println(" Có thể gõ 'REQ' ở đây HOẶC bấm nút trên GUI.");
+            System.out.println("=================================================\n");
+            
+            Scanner scanner = new Scanner(System.in);
+            while (scanner.hasNextLine()) {
+                String command = scanner.nextLine().trim();
+                if (command.equalsIgnoreCase("REQ")) {
+                    new Thread(() -> node.requestCriticalSection()).start();
+                }
+                else if (command.equalsIgnoreCase("EXIT")){
+                    scanner.close();
+                    System.exit(0);
+                }
+                else {
+                    System.out.println("Lệnh không hợp lệ! Chỉ nhận lệnh 'REQ' hoặc 'EXIT'.");
+                }
             }
-            else {
-               System.out.println("Lệnh không hợp lệ! Chỉ nhận lệnh 'REQ'.");
-           }
-        }
-
-
+        }).start();
     }
 }

@@ -49,6 +49,29 @@ public class Node {
     private int replyCount = 0;
     private final List<Neighbor> deferredQueue = new ArrayList<>();
 
+    // =========================================================
+    // KHÚC 1: BIẾN KẾT NỐI SANG GIAO DIỆN APPGUI
+    // =========================================================
+    private AppGUI gui;
+
+    public void setGUI(AppGUI gui) {
+        this.gui = gui;
+        triggerGuiUpdate();
+    }
+
+    private void triggerGuiUpdate() {
+        if (this.gui != null) {
+            this.gui.updateUI(this.state.toString(), this.clock.getTimestamp(), this.replyCount, getNeighborCount(), sharedResource.getSharedValue());
+        }
+    }
+
+    private void logToBoth(String msg) {
+        System.out.println(msg);
+        if (this.gui != null) {
+            this.gui.appendLog(msg);
+        }
+    }
+
     // Cổng UDP chung cố định cho tất cả các máy để phát hiện nhau
     private static final int DISCOVERY_PORT = 8888; 
 
@@ -277,6 +300,8 @@ public class Node {
         this.myRequestTimestamp = clock.getTimestamp();
         this.replyCount = 0;
 
+        triggerGuiUpdate();
+
         System.out.println(String.format("\n[Node %d] TRẠNG THÁI: WANTED (T_req=%d)", this.id, this.myRequestTimestamp));
 
         synchronized (neighbors) {
@@ -387,6 +412,8 @@ public class Node {
     }
 
     private void enterCriticalSection() {
+        this.state = State.HELD; 
+        triggerGuiUpdate();
         System.out.println(String.format("\n>>> [ENTER] Node %d bắt đầu độc chiếm tài nguyên", this.id));
         
         // 1. Thay đổi dữ liệu trên chính máy mình
@@ -407,6 +434,7 @@ public class Node {
 
         this.state = State.RELEASED;
         
+        triggerGuiUpdate();
         System.out.println(String.format("[Node %d] Thoát CS. Giải phóng hàng đợi...", this.id));
         List<Neighbor> toRelease = new ArrayList<>(deferredQueue);
         deferredQueue.clear(); 
