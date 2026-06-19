@@ -8,3 +8,15 @@
 [Node 2] cập nhật trong CS | Value = 20 | T = 7
 [Node 2] cập nhật trong CS | Value = 10 | T = 9
 Đồng bộ từ Node 1 | Value = 20
+[REPL ] From Node 1 | Value=10
+[LOCAL] Node 2 | CS UPDATE | Value=20 | Lamport=7
+[LOCAL] Node 2 | CS UPDATE | Value=30 | Lamport=11
+[REPL ] From Node 1 | Value=40
+[LOCAL] Node 2 | CS UPDATE | Value=50 | Lamport=17
+[REPL ] From Node 1 | Value=60
+[REPL ] From Node 1 | Value=70
+[REPL ] From Node 1 | Value=80
+[REPL ] From Node 1 | Value=10
+[LOCAL] Node 2 | CS UPDATE | Value=20 | Lamport=7
+[REPL ] From Node 1 | Value=30
+[LOCAL] Node 2 | CS UPDATE | Value=40 | Lamport=13

@@ -66,7 +66,7 @@ public class Node {
     }
 
     private void logToBoth(String msg) {
-        System.out.println(msg);
+        System.out.println(msg); 
         if (this.gui != null) {
             this.gui.appendLog(msg);
         }
@@ -156,7 +156,7 @@ public class Node {
             
 //             try (DatagramSocket socket = new DatagramSocket(DISCOVERY_PORT)) {
 
-//                 System.out.println("UDP listener started on " + DISCOVERY_PORT);
+//                 logToBoth("UDP listener started on " + DISCOVERY_PORT);
 //                 socket.setBroadcast(true);
 //                 byte[] buffer = new byte[1024];
                 
@@ -178,7 +178,7 @@ public class Node {
 //                             synchronized (neighbors) {
 //                                 if (!neighbors.contains(newNeighbor)) {
 //                                     neighbors.add(newNeighbor);
-//                                     System.out.println(String.format("\n[TỰ ĐỘNG PHÁT HIỆN]: Đã tìm thấy Node %d tại địa chỉ LAN (%s:%d)", remoteId, remoteIp, remotePort));
+//                                     logToBoth(String.format("\n[TỰ ĐỘNG PHÁT HIỆN]: Đã tìm thấy Node %d tại địa chỉ LAN (%s:%d)", remoteId, remoteIp, remotePort));
 //                                     System.out.print("Nhập lệnh (REQ để chiếm miền găng): ");
 //                                 }
 //                             }
@@ -233,7 +233,7 @@ public class Node {
             // Mạng private + có rule firewall inbound port: localhost + tcp từ ngoài vào dc (mạng có password)
             serverSocket.bind(new InetSocketAddress("0.0.0.0", myPort));
 
-            System.out.println(String.format("[Node %d] Server (IP:%s) đang chạy ở port %d...", id, myIp, myPort));
+            logToBoth(String.format("[Node %d] Server (IP:%s) đang chạy ở port %d...", id, myIp, myPort));
 
                 while (true) {
                     Socket socket = serverSocket.accept();
@@ -275,7 +275,7 @@ public class Node {
                     // Nhận lệnh đồng bộ dữ liệu từ node đang ở trong CS
                     int newValue = Integer.parseInt(parts[4]);
                     sharedResource.passiveUpdate(senderId, newValue);
-                    System.out.println(String.format("[HỆ THỐNG] Đã đồng bộ dữ liệu theo Node %d (Value mới = %d)", senderId, newValue));
+                    logToBoth(String.format("[HỆ THỐNG] Đã đồng bộ dữ liệu theo Node %d (Value mới = %d)", senderId, newValue));
                 }
             }
         } catch (Exception e) {
@@ -302,11 +302,11 @@ public class Node {
 
         triggerGuiUpdate();
 
-        System.out.println(String.format("\n[Node %d] TRẠNG THÁI: WANTED (T_req=%d)", this.id, this.myRequestTimestamp));
+        logToBoth(String.format("\n[Node %d] TRẠNG THÁI: WANTED (T_req=%d)", this.id, this.myRequestTimestamp));
 
         synchronized (neighbors) {
             if (neighbors.isEmpty()) {
-                System.out.println(String.format("[Node %d] Chưa tìm thấy hàng xóm nào trong mạng. Tự tiến vào miền găng.", this.id));
+                logToBoth(String.format("[Node %d] Chưa tìm thấy hàng xóm nào trong mạng. Tự tiến vào miền găng.", this.id));
                 this.state = State.HELD;
                 new Thread(() -> enterCriticalSection()).start();
                 return;
@@ -315,7 +315,7 @@ public class Node {
             // Duyệt danh sách, gửi request tới từng hàng xóm 
             String msg = String.format("REQUEST,%d,%s,%d,%d", this.id, this.myIp, this.myPort, myRequestTimestamp);
             for (Neighbor neighbor : neighbors) {
-                System.out.println(String.format("\n[Node %d] ---> GỬI REQUEST (T=%d, id=%d) tới Node %d:%s:%d", this.id, this.myRequestTimestamp, this.id, neighbor.id, neighbor.ip, neighbor.port));
+                logToBoth(String.format("\n[Node %d] ---> GỬI REQUEST (T=%d, id=%d) tới Node %d:%s:%d", this.id, this.myRequestTimestamp, this.id, neighbor.id, neighbor.ip, neighbor.port));
                 new Thread(() -> sendMessageViaSocket(neighbor.ip, neighbor.port, msg)).start();
             }
         }
@@ -327,7 +327,7 @@ public class Node {
     }
 
     public synchronized void receiveRequest(Neighbor sender, int senderTimestamp) {
-        System.out.println(String.format("[Node %d] <--- NHẬN REQUEST từ Node %d [T_req=%d]", this.id, sender.id, senderTimestamp));
+        logToBoth(String.format("[Node %d] <--- NHẬN REQUEST từ Node %d [T_req=%d]", this.id, sender.id, senderTimestamp));
         clock.update(senderTimestamp);
 
         // So sánh 2 request (n1 -> n2, n2 -> n1)
@@ -361,7 +361,7 @@ public class Node {
                 sb.append(q.id + " "); 
             }
             sb.append("\n");
-            System.out.println(sb.toString());
+            logToBoth(sb.toString());
 
         } else {
 
@@ -373,7 +373,7 @@ public class Node {
             else if(this.state == State.RELEASED){
                 msg = this.id + " không bận, phản hồi " + sender.id + " ngay";
             }
-            System.out.println(String.format(
+            logToBoth(String.format(
                     "[Node %d] <--- NHẬN REQUEST từ Node %d (T_req=%d)."
                             + "So sánh:\nmyReq(T=%d, id=%d)\nother(T_req=%d, id_req=%d)\n"
                             + "Kết quả: " + msg, 
@@ -390,7 +390,7 @@ public class Node {
     private void sendReply(Neighbor target) {
         clock.increment();
         String msg = String.format("REPLY,%d,%s,%d,%d", this.id, this.myIp, this.myPort, clock.getTimestamp());
-        System.out.println("Đang gửi phản hồi tới " + target.id + ": " + msg);
+        logToBoth("Đang gửi phản hồi tới " + target.id + ": " + msg);
         new Thread(() -> sendMessageViaSocket(target.ip, target.port, msg)).start();
     }
 
@@ -401,7 +401,7 @@ public class Node {
         int totalNeighbors = 0;
         synchronized(neighbors) { totalNeighbors = neighbors.size(); }
 
-        System.out.println(String.format("[Node %d] <--- NHẬN REPLY từ Node %d. (Đã thu thập %d/%d REPLY)", 
+        logToBoth(String.format("[Node %d] <--- NHẬN REPLY từ Node %d. (Đã thu thập %d/%d REPLY)", 
                 this.id, senderId, replyCount, totalNeighbors));
 
         // Nếu đủ số reply thì vào CS
@@ -414,7 +414,7 @@ public class Node {
     private void enterCriticalSection() {
         this.state = State.HELD; 
         triggerGuiUpdate();
-        System.out.println(String.format("\n>>> [ENTER] Node %d bắt đầu độc chiếm tài nguyên", this.id));
+        logToBoth(String.format("\n>>> [ENTER] Node %d bắt đầu độc chiếm tài nguyên", this.id));
         
         // 1. Thay đổi dữ liệu trên chính máy mình
         sharedResource.accessAndModify(this.clock.getTimestamp());
@@ -430,17 +430,17 @@ public class Node {
         // Giả lập làm việc trong CS 2 giây
         try { Thread.sleep(5000); } catch (InterruptedException e) {}
 
-        System.out.println(String.format("<<< [EXIT] Node %d rời miền găng.", this.id));
+        logToBoth(String.format("<<< [EXIT] Node %d rời miền găng.", this.id));
 
         this.state = State.RELEASED;
         
         triggerGuiUpdate();
-        System.out.println(String.format("[Node %d] Thoát CS. Giải phóng hàng đợi...", this.id));
+        logToBoth(String.format("[Node %d] Thoát CS. Giải phóng hàng đợi...", this.id));
         List<Neighbor> toRelease = new ArrayList<>(deferredQueue);
         deferredQueue.clear(); 
         
         for (Neighbor neighbor : toRelease) {
-            System.out.println(String.format("[Node %d] ---> TRẢ NỢ REPLY cho Node %d tại (%s:%d)", this.id, neighbor.id, neighbor.ip, neighbor.port));
+            logToBoth(String.format("[Node %d] ---> TRẢ NỢ REPLY cho Node %d tại (%s:%d)", this.id, neighbor.id, neighbor.ip, neighbor.port));
             sendReply(neighbor);
         }
 
