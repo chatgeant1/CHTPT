@@ -13,12 +13,12 @@ public class mainClass {
         // TEST LOCAL:
         boolean localTest = false;
         
-        String IP1 = localTest ? "localhost" : "localhost";
-        String IP2 = localTest ? "localhost" : "localhost";
-        String IP3 = localTest ? "localhost" : "localhost";
-        String IP4 = localTest ? "localhost" : "localhost";
-        String IP5 = localTest ? "localhost" : "localhost";
-        String IP6 = localTest ? "localhost" : "localhost";
+        String IP1 = localTest ? "localhost" : "192.168.222.220";   // run1.bat
+        String IP2 = localTest ? "localhost" : "192.168.222.101";   // run2.bat
+        String IP3 = localTest ? "localhost" : "192.168.222.248";   // run3.bat
+        String IP4 = localTest ? "localhost" : "192.168.222.142";   // run4.bat
+        String IP5 = localTest ? "localhost" : "192.168.222.33";    // run5.bat
+        String IP6 = localTest ? "localhost" : "192.168.222.182";   // run6.bat
 
         // DANH SÁCH CÁC NODE THAM GIA
         List<Node.Neighbor> allNodes = new ArrayList<>();

@@ -73,7 +73,7 @@ public class Node {
             : deferredQueue.stream()
                 .map(n -> "P" + n.id)
                 .collect(Collectors.joining(","));
-                
+
             this.gui.updateUI(this.state.toString(), this.clock.getTimestamp(), this.replyCount, getNeighborCount(), sharedResource.getSharedValue(), queueText);
         }
     }
@@ -404,6 +404,7 @@ public class Node {
 
     private void sendReply(Neighbor target) {
         clock.increment();
+        triggerGuiUpdate();
         String msg = String.format("REPLY,%d,%s,%d,%d", this.id, this.myIp, this.myPort, clock.getTimestamp());
         logToBoth("Đang gửi phản hồi tới " + target.id + ": " + msg);
         new Thread(() -> sendMessageViaSocket(target.ip, target.port, msg)).start();
