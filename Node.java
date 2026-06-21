@@ -438,6 +438,7 @@ public class Node {
         // 1. Thay đổi dữ liệu trên chính máy mình
         sharedResource.accessAndModify(this.clock.getTimestamp());
 
+        triggerGuiUpdate();
         // 2. Phát lệnh mạng ép các Node khác đồng bộ theo giá trị mới qua Socket đang có sẵn
         int newValue = sharedResource.getSharedValue();
         for (Neighbor neighbor : neighbors) { 
