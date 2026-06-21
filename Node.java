@@ -288,6 +288,7 @@ public class Node {
                     // Nhận lệnh đồng bộ dữ liệu từ node đang ở trong CS
                     int newValue = Integer.parseInt(parts[4]);
                     sharedResource.passiveUpdate(senderId, newValue);
+                    triggerGuiUpdate();
                     logToBoth(String.format("[HỆ THỐNG] Đã đồng bộ dữ liệu theo Node %d (Value mới = %d)", senderId, newValue));
                 }
             }

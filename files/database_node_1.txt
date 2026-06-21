@@ -77,3 +77,7 @@
 [REPL ] From Node 2 | Value=130
 [REPL ] From Node 3 | Value=140
 [LOCAL] Node 1 | CS UPDATE | Value=150 | Lamport=84
+[LOCAL] Node 1 | CS UPDATE | Value=10 | Lamport=4
+[REPL ] From Node 2 | Value=20
+[LOCAL] Node 1 | CS UPDATE | Value=30 | Lamport=10
+[REPL ] From Node 2 | Value=40

@@ -13,21 +13,21 @@ public class mainClass {
         // TEST LOCAL:
         boolean localTest = false;
         
-        String IP1 = localTest ? "localhost" : "192.168.222.220";   // run1.bat
-        String IP2 = localTest ? "localhost" : "192.168.222.101";   // run2.bat
-        String IP3 = localTest ? "localhost" : "192.168.222.248";   // run3.bat
-        String IP4 = localTest ? "localhost" : "192.168.222.142";   // run4.bat
-        String IP5 = localTest ? "localhost" : "192.168.222.33";    // run5.bat
-        String IP6 = localTest ? "localhost" : "192.168.222.182";   // run6.bat
+        String IP1 = localTest ? "localhost" : "192.168.1.17";   // run1.bat
+        String IP2 = localTest ? "localhost" : "192.168.1.3";   // run2.bat
+        // String IP3 = localTest ? "localhost" : "192.168.222.248";   // run3.bat
+        // String IP4 = localTest ? "localhost" : "192.168.222.142";   // run4.bat
+        // String IP5 = localTest ? "localhost" : "192.168.222.33";    // run5.bat
+        // String IP6 = localTest ? "localhost" : "192.168.222.182";   // run6.bat
 
         // DANH SÁCH CÁC NODE THAM GIA
         List<Node.Neighbor> allNodes = new ArrayList<>();
         allNodes.add(new Node.Neighbor(1, IP1, 9001));
         allNodes.add(new Node.Neighbor(2, IP2, 9002));
-        allNodes.add(new Node.Neighbor(3, IP3, 9003));
-        allNodes.add(new Node.Neighbor(4, IP4, 9004));
-        allNodes.add(new Node.Neighbor(5, IP5, 9005));
-        allNodes.add(new Node.Neighbor(6, IP6, 9006));
+        // allNodes.add(new Node.Neighbor(3, IP3, 9003));
+        // allNodes.add(new Node.Neighbor(4, IP4, 9004));
+        // allNodes.add(new Node.Neighbor(5, IP5, 9005));
+        // allNodes.add(new Node.Neighbor(6, IP6, 9006));
 
         int myId = Integer.parseInt(args[0]);
         int myPort = Integer.parseInt(args[1]);
