@@ -62,3 +62,18 @@
 [REPL ] From Node 6 | Value=380
 [REPL ] From Node 2 | Value=390
 [REPL ] From Node 4 | Value=400
+[REPL ] From Node 6 | Value=10
+[REPL ] From Node 2 | Value=20
+[LOCAL] Node 1 | CS UPDATE | Value=30 | Lamport=29
+[REPL ] From Node 3 | Value=40
+[REPL ] From Node 5 | Value=50
+[REPL ] From Node 4 | Value=60
+[REPL ] From Node 2 | Value=70
+[REPL ] From Node 2 | Value=80
+[REPL ] From Node 3 | Value=90
+[REPL ] From Node 2 | Value=100
+[REPL ] From Node 3 | Value=110
+[REPL ] From Node 6 | Value=120
+[REPL ] From Node 2 | Value=130
+[REPL ] From Node 3 | Value=140
+[LOCAL] Node 1 | CS UPDATE | Value=150 | Lamport=84
